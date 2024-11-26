@@ -1,14 +1,15 @@
 import cv2
 import numpy as np
 
+
 # Prepare the face recognizer
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 # Load the pre-trained face detector
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-# Prepare the image (your prepared photo)
-img = cv2.imread('assets/myface.png')  # Replace with your image file name
+# Prepare the image
+img = cv2.imread("assets/meincap.png")  # Replace with your image file name
 
 # Check if the image was loaded successfully
 if img is None:
@@ -31,5 +32,5 @@ else:
 
     # Train the recognizer using this image (you can use multiple faces for a dataset)
     recognizer.train([roi_gray], np.array([0]))  # '0' is the label for this face
-    recognizer.save('trainer.yml')  # Save the trained model
+    recognizer.save('Tim.yml')  # Save the trained model
     print("Training complete!")
