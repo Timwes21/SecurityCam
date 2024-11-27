@@ -1,0 +1,19 @@
+Stage 1: Set up Camera
+- detect faces
+- detect specific faces
+- send message based on who's on camera
+
+Stage 2: Set up API
+- see live video
+
+
+Stage 3:  Connect Rasberry Pi
+- Get the Http request to make the camera wireless
+
+
+Stage 4: Motion sensor
+- Video will be sent directly to the bot if motion is detected
+
+
+Stage 5: Create app through kivy
+- Display video
