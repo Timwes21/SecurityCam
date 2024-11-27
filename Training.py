@@ -9,7 +9,7 @@ recognizer = cv2.face.LBPHFaceRecognizer_create()
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
 # Prepare the image
-img = cv2.imread("assets/meincap.png")  # Replace with your image file name
+img = cv2.imread("assets/meagain.png")  # Replace with your image file name
 
 # Check if the image was loaded successfully
 if img is None:
