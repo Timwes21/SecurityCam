@@ -1,14 +1,23 @@
-import requests
 import time
+import threading
 
-start = time.perf_counter()//2
-later = start
+def task(count):
+    print("Handling task")
+    time.sleep(2)
+    print("task is done")
 
 
-while True:
-    now = time.perf_counter()//2
+thread_1 = threading.Thread(target=task(1))
+thread_2 = threading.Thread(target=task(2))
 
-    if now > later:
-        print("now")
-        later = start + 10
-        start = now
+
+
+
+thread_1.start()
+thread_2.start()
+
+def main():
+
+
+thread_1.join()
+thread_2.join()
