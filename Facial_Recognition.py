@@ -1,7 +1,8 @@
 import cv2
 import time
 import requests
-from flask import Flask, Response
+import base64
+from flask import Flask, render_template
 import threading
 
 app = Flask(__name__)
@@ -53,22 +54,27 @@ def face_detection(video):
 
 def stream_cam():
     while True:
-        ret, frame = cap2.read()
+        ret, frame = cap.read()
         if not ret:
-            print("this didnt work")
+            print("ret not working")
             exit()
 
 
-        _, buffer = cv2.imencode(".jpg", frame)
-        frame_bytes = buffer.tobytes()
+        success, buffer = cv2.imencode(".jpg", frame)
+        
+        if success:
+            print("it is working")
+        else:
+            print("it is not working")
 
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        frame_base64 = base64.b64encode(buffer).decode('utf-8')
+        
+        return frame_base64
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+
 start = time.perf_counter()//2
 later = start + 5 #seconds = 10 * 2
+
 def security():
     while True:
         ret, frame = cap.read()
@@ -85,14 +91,16 @@ def security():
 
 @app.route('/')
 def home():
-    return "<h1>Video Stream</h1><p>Go to <a href='/video'>/video</a> to view the video stream.</p>"
+    frame = stream_cam()
+    return render_template('home.html', frame=frame)
 
 @app.route('/video')
 def stream():
-    return Response(stream_cam(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    frame = stream_cam()
+    return render_template('home.html', frame=frame)
 
 
 if __name__ == '__main__':
-    camera_thread = threading.Thread(target=security, daemon=True)
-    camera_thread.start()
+    #camera_thread = threading.Thread(target=security, daemon=True)
+    #camera_thread.start()
     app.run(debug=True)
