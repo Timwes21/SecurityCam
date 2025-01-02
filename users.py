@@ -11,7 +11,7 @@ class User:
         self.cameras[ip_address] = False
 
     def remove_camera(self, ip_address):
-        self.cameras.pop(ip_address)
+        self.cameras.pop(ip_address) # comment to change 
     
     def activate_camera(self):
         n=1
