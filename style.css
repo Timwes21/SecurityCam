@@ -1,0 +1,266 @@
+*{
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    
+    
+}
+body{
+    background: rgb(255, 255, 255);
+
+}
+.login-page{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    background: rgb(200, 46, 46);
+    
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.login-con{
+    background-color: rgb(49, 49, 49);
+    display: flex;
+    width: 200px;
+    flex-direction: column;
+    justify-content: center;
+    height: 250px;
+    gap: 20px;
+    color: white;
+    box-shadow: 0px 0px 5px black;
+}
+.login-con .input{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 20px;
+}
+.buttons{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 190px;
+    width: 200px;
+    position: absolute;
+    
+    
+}
+.buttons button{
+    background-color: rgb(90, 90, 90);
+    border: 0;
+    border-radius: 5px;
+    color: white;
+    height: 50px;
+    width: 45%;
+}
+.heading{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction:row;
+    height: 100px;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    
+}
+.leftside{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap:40px;
+}
+.notif-drop{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: medium;
+    border-bottom: 3px solid rgb(0, 0, 0);
+    transition:ease .3s;
+    cursor: pointer;
+    margin-left: 50px;
+}
+.notif-drop:hover{
+    border-bottom: 3px solid rgb(218, 0, 0);
+}
+.notifs{
+    display: flex;
+    width: 250px;
+    height: 300px;
+    background-color: aliceblue;
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 10px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px black;
+    justify-content:flex-start;
+    align-items:center;
+    flex-direction: column;
+    visibility: hidden;
+    gap: 10px;
+    overflow: auto;
+    
+    
+}
+.notif{
+    background-color: rgb(255, 59, 59);
+    border-radius: 5px;
+    padding: 10px;
+    
+}
+.time{
+    background: none;
+    color: black;
+    font-family:Verdana, Geneva, Tahoma, sans-serif ;
+    font-size:x-small;
+}
+.logout{
+    font-size: medium;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-bottom: 3px solid rgb(0, 0, 0);
+}
+.logout:hover{
+    border-bottom: 3px solid rgb(218, 0, 0);
+    cursor: pointer;
+}
+.heading button{
+    width: 110px;
+    height: 40px;
+    display: flex;
+    
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(212, 0, 0);
+    border: 0;
+    color: inherit;
+    border-radius: 10px;
+    margin-right: 20px;
+    
+}
+.heading button a{
+    color: aliceblue;
+}
+.main{
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+    height: 450px;
+    gap: 90px;
+    justify-content:space-around;
+    
+}
+.button-con{
+    background: rgb(255, 255, 255);
+    height: 100%;
+    width: 350px;
+    border-radius: 20px;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.47);
+    border: 1px solid rgb(255, 0, 0);
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+}
+.buttons-controls h1{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    color: rgb(0, 0, 0);
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    
+}
+.buttons-controls{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.47);
+    border: 1px solid rgb(255, 0, 0);
+    border-radius: 10px;
+    
+    
+}
+.main-controls{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.47);
+    border: 1px solid rgb(255, 0, 0);
+    border-radius: 10px;
+    width: 80%;
+    padding: 10px;
+}
+.buttons-controls button{
+    background-color: rgb(210, 0, 0);
+    border: 0;
+    border-radius: 5px;
+    color: aliceblue;
+    width: 130px;
+    height: 30px;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.317);
+}
+.buttons-controls button:hover{
+    background-color: rgb(255, 67, 67);
+}
+.buttons-controls button:active{
+    background-color: rgb(121, 0, 0);
+}
+.status{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+.buttons-controls input{
+    border: 0;
+    width: 150px;
+}
+.input-ip button{
+    width: 75px;
+}
+.camera-buttons{
+    display: flex;
+    padding: 10px;
+    background-color: antiquewhite;
+
+}
+.camera-buttons button{
+    width: 80px;
+    
+}
+.video-feed{
+    background: linear-gradient(to bottom right, rgb(0, 0, 0), rgb(0, 0, 0));
+    height: 100%;
+    border-radius: 10px;
+    width: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.642); */
+}
+.video-feed h3{
+    color: white;
+    margin-top: -15px;
+    height: 20px;
+}
+.video-feed h2{
+    color:aliceblue;
+    justify-self: flex-end;
+    font-size: small;
+    
+    
+}
+.video{
+    width: 95%;
+    height: 90%;
+    background-color: rgb(92, 92, 92);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    
+    
+}
+.video img{
+    width: 100%;
+}

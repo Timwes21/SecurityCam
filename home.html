@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Camera</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="heading">
+            <div class="leftside">
+
+                <div class="notif-con">
+                    <h2 class="notif-drop">Notifications v</h2>
+                    <div class="notifs">
+                        <div class="full-notif">
+                            <p class="time">1:33p, thurday </p>
+                            <p class="notif">someone is on camera</p>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="logout">Log Out</h3>
+            </div>
+                <h1>Security Camera</h1>
+                <button><a href="">Recordings</a></button>
+            </div>
+    </header>
+    <section class="main">
+        <div class="buttons-controls">
+            
+                <h1>Controls</h1>
+                <div class="main-controls">
+
+                    <div class="control">
+                        <p id="facial-status" class="status"></p>
+                        <button id="facial-rec">Facial Recognition</button>
+                    </div>
+                    
+                    <div class="control">
+                        <p id="notif-status" class="status"></p>
+                        <button id="notif">Notifications</button>
+                    </div>
+                    
+                    <div class="control">
+                        <p class="status" id="black-and-white-status"></p>
+                        <button id="black-and-white">Black and White</button>
+                    </div>
+                    
+                </div>
+                <h2>Cameras</h2>
+                <button class="add-camera" id="add-cam">Add a Camera</button>
+                <div class="input-ip"></div>
+                <div class="camera-buttons"></div>
+            
+        </div>
+        <div class="video-feed">
+            <h3>Live Feed</h3>
+            <div class="video"><img id="img" src="http://127.0.0.1:8000/video"  alt=""></div>
+            
+        </div>
+    </section>
+    <script src="app.js"></script>
+</body>
+</html>
