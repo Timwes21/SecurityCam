@@ -38,11 +38,30 @@ async def video_feed(request: Request):
 
 
 
+@app.post("/phone-number")
+async def phone_numbers(request: Request):
+    data = await request.json()
+    username = data["username"]
+    phone_number = data["phone_number"]
+    for user in users:
+        if user.username == username:
+            user.notifications.append(phone_number)
+            break
+
 @app.post("/buttons")
 async def button_pressed(request: Request):
     data = await request.json()
-    print(data)
-    return {"message": "Button pressed!", "data": data}
+    username = data["username"]
+    button_pressed = data["button_pressed"]
+    for user in users:
+        if user.username == username:
+            if button_pressed == "refresh":
+                user.refresh_cameras()
+            elif button_pressed == "notif switch":
+                user.set_notifications()
+            elif button_pressed == "fr switch":
+                user.facial_recogintion()
+            break
 
 @app.post("/login")
 async def login(request: Request):
@@ -53,6 +72,13 @@ async def login(request: Request):
             message = "Login successful!"
             break
     return {"message": message}
+
+
+@app.post("/new-user")
+async def new_user(request: Request):
+    data = await request.json()
+    new_user = User(data["username"], data["password"])
+    users.append(new_user)
 
     
 
