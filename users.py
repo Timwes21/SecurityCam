@@ -1,10 +1,11 @@
-from Security_Camera import stream
+from Security_Camera import stream, stream_puter
 import datetime
 
 class User:
     cameras = {}
     notifications = []
     phone_number = ""
+    model_paths = {}
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -22,7 +23,10 @@ class User:
         n=1
         for camera in self.cameras:
             if self.cameras[camera] == False:
-                stream(camera, n)
+                if camera == "puter":
+                    stream_puter()
+                else:
+                    stream(camera, n)
                 self.cameras[camera] = True
             n+=1
     
@@ -35,9 +39,9 @@ class User:
         self.notification_status = not self.notification_status
     
     def facial_recogintion(self):
-        pass
+        self.facial_rec = not self.facial_rec
 
-    def set_phone_number(self, phone_number):
-        self.phone_number = phone_number
+    def train_model(self):
+        pass
 
    

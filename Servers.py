@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from Security_Camera import stream, notifications_and_times
+from Security_Camera import stream, notifications_and_times, stream_puter
 from users import User
 import json
-
 
 app = FastAPI()
 
@@ -45,8 +45,7 @@ async def phone_numbers(request: Request):
     phone_number = data["phone_number"]
     for user in users:
         if user.username == username:
-            user.notifications.append(phone_number)
-            break
+            user.phone_number = phone_number
 
 @app.post("/buttons")
 async def button_pressed(request: Request):
@@ -79,6 +78,27 @@ async def new_user(request: Request):
     data = await request.json()
     new_user = User(data["username"], data["password"])
     users.append(new_user)
+
+@app.post("/add-face")
+async def add_face(request: Request):
+    data = await request.json()
+    username = data['username']
+    person = data['person']
+    image_count = data['image_count']
+    model_path = train_model(username, person, image_count)
+    for user in users:
+        if user.username == username:
+            user.model_paths[person] = model_path
+
+@app.get("/test")
+async def video():
+    return StreamingResponse(stream_puter(), media_type="multipart/x-mixed-replace; boundary=frame")
+
+
+
+
+
+
 
     
 

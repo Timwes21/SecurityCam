@@ -1,10 +1,10 @@
 import cv2
 import asyncio
 import json
-from telegram import send_message
-import time
-from Training import create_person_model
 import datetime
+import time
+
+
 
 datetime_function = datetime.datetime.now()
 people_detected = []
@@ -23,13 +23,10 @@ cap = cv2.VideoCapture(0)
 # API key: SecurityBotChat
         
         
-def facial_rec(frame, camera):
+def facial_rec(image_path, labels, person):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_classifier.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-    if len(faces) > 1 and "unknown" not in people_detected:
-        people_detected.append("unknown")
-        if camera == 0:
-            create_person_model(frame, "unknown")
+    
     
 def manage_notifications(later, now, desired_amount_of_notifs, camera_number):
     if len(people_detected) > 0 and later < now:
@@ -60,9 +57,20 @@ async def stream(ip_address, camera_number):
             print("Failed to grab frame")
             continue
         
-        facial_rec(frame)
-        
         later = manage_notifications(later, now, 20, camera_number)
         
  
 
+def stream_puter():
+    cap = cv2.VideoCapture(0)
+    while True:
+        success, frame = cap.read()
+        if not success:
+            break
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+
+        print("computer camera is being streamedS")
+
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
