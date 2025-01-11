@@ -1,9 +1,18 @@
 let login = false
 
+const homePage = "home.html"
+const loginPage = "login.html"
+const createAccountPage = "createaccount.html"
+const loginApi = "http://127.0.0.1:8000/login"
+const createAccountApi = "http://127.0.0.1:8000/new-user"
+const buttonApi = "http://127.0.0.1:8000/buttons"
+const numberApi = "http://127.0.0.1:8000/phone-number"
+const cameraApi = "http://127.0.0.1:8000/cameras"
+const testApi = "http://127.0.0.1:8000/test"
 
 
 if (localStorage.getItem("login") === null || localStorage.getItem("login") === "false"){
-    fetch("login.html")
+    fetch(loginPage)
         .then(response => response.text())
         .then(data => {
             let parser = new DOMParser();
@@ -11,7 +20,7 @@ if (localStorage.getItem("login") === null || localStorage.getItem("login") === 
             let body = doc.body.innerHTML;
             document.querySelector("body").innerHTML = body;
 
-
+            addUser()
             let loginButton = document.querySelector("#login");
             if (loginButton) {
                 loginButton.addEventListener("click", () => {
@@ -24,7 +33,7 @@ if (localStorage.getItem("login") === null || localStorage.getItem("login") === 
                         return;
                     }
 
-                    fetch("http://127.0.0.1:8000/login", {
+                    fetch(loginApi, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -61,6 +70,45 @@ else{
 }
 
 
+function addUser(){
+    let addAccountButton = document.querySelector("#createaccount")
+    if (addAccountButton){
+        
+        addAccountButton.addEventListener("click", () => {
+            fetch(createAccountPage)
+            .then(response => response.text())
+            .then(data => {
+                let parser = new DOMParser();
+                let doc = parser.parseFromString(data, "text/html");
+                let body = doc.body.innerHTML;
+                document.querySelector("body").innerHTML = body;
+                document.querySelector("#add-account").addEventListener("click", () => {
+                    let newUsername = document.querySelector("#add-username").value
+                    let newPassword = document.querySelector("#add-password").value
+                    if (newUsername.length > 1 && newPassword.length > 1){
+                        fetch(createAccountApi, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ username: newUsername, password: newPassword })
+                        })
+                        loadHomeState()    
+                        localStorage.setItem("login", "true");
+                        localStorage.setItem("username", newUsername);
+                    }
+                    else{
+                        document.querySelector("#message").innerText = "Please enter a username and password"
+                    }
+                })
+            })
+        })
+    }
+    else{
+        console.error("Add account button not found in the loaded content.")
+    }
+}
+
 
 
 
@@ -81,6 +129,14 @@ function press_button(button, status_button, switch_name){
             status_button.innerText = "OFF"
         }
         status_button.style.color = status_button.innerText === "ON"? "green":"red"
+
+        fetch(buttonApi, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username: localStorage.getItem("username"), password: newPassword })
+        })
     })
 }
 
@@ -89,6 +145,24 @@ function facial_recogntion(notif_status){
         document.querySelector(".peeps").innerText = `${peopleOnScreen}`
         
     }
+}
+
+function addNumber(){
+    let input = document.createElement("#number")
+    let submit = document.createElement("#submit-number")
+    submit.addEventListener("click", () => {
+        if (input.value.length > 10){
+            fetch(numberApi, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username: localStorage.getItem("username"), phone_number: input.value })
+            })
+            localStorage.setItem("phone-number", input.value)
+
+        }
+    })
 }
 
 function addCamera(){
@@ -103,21 +177,26 @@ function addCamera(){
         let input = document.createElement("input")
         let inputButton = document.createElement("button")
         let cancelButton = document.createElement("button")
+        let puterButton = document.createElement('button')
+        
         cancelButton.innerText = "Cancel"
-
+        inputButton.innerText = "Submit"
+        puterButton.innerText = "Computer Camera"
+        
         input.setAttribute("type", "text")
         input.setAttribute("placeholder", "Enter camera ip address")
-        inputButton.innerText = "Submit"
         inputDiv.appendChild(input)
         document.querySelector(".input-ip").appendChild(inputDiv)
         document.querySelector(".input-ip").appendChild(inputButton)
         document.querySelector(".input-ip").appendChild(cancelButton)
+        document.querySelector(".input-ip").appendChild(puterButton)
         
 
         cancelButton.addEventListener("click", () => {
             document.querySelector(".input-ip").removeChild(inputDiv)
             document.querySelector(".input-ip").removeChild(inputButton)
             document.querySelector(".input-ip").removeChild(cancelButton)
+            document.querySelector(".input-ip").removeChild(puterButton)
         })
 
 
@@ -135,12 +214,34 @@ function addCamera(){
                 document.querySelector(".camera-buttons").appendChild(cameraButton)
                 document.querySelector(".input-ip").removeChild(inputDiv)
                 document.querySelector(".input-ip").removeChild(inputButton)
+                document.querySelector(".input-ip").removeChild(puterButton)
+
+                fetch(cameraApi, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username: username, ip_address: password })
+                })
             }
             else{
                 alert("Please enter an ip address")
             }
 
         })
+
+        puterButton.addEventListener("click", () => {
+            
+            fetch(cameraApi, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username: username, ip_address: "puter" })
+            })
+        })
+
+
     })
 }
 
@@ -154,6 +255,9 @@ function loadCameraButtons(){
         cameraButton.id = camera
         cameraButtons.appendChild(cameraButton)
         n++
+        cameraButton.addEventListener("click", () => {
+
+        })
     })
 }
 
@@ -169,6 +273,10 @@ function loadCameraFeed(){
     })
     
     videoImg.src = localStorage.getItem("videoURL")
+}
+
+function chooseCameraFormat(){
+    
 }
 
 
@@ -193,7 +301,6 @@ function loadHomeState(){
                 }
             
             })
-
         
             let fr_button = document.querySelector("#facial-rec")
             let fr_status = document.querySelector("#facial-status")
@@ -205,7 +312,7 @@ function loadHomeState(){
 
             let bw_button = document.querySelector("#black-and-white")
             let bw_status = document.querySelector("#black-and-white-status")
-            let bw_switch = "bw switch"
+            let bw_switch = "refresh"
 
         
             press_button(fr_button, fr_status, fr_switch)

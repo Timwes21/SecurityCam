@@ -10,20 +10,28 @@
     <header>
         <div class="heading">
             <div class="leftside">
-
                 <div class="notif-con">
                     <h2 class="notif-drop">Notifications v</h2>
                     <div class="notifs">
-                        <div class="full-notif">
-                            <p class="time">1:33p, thurday </p>
-                            <p class="notif">someone is on camera</p>
+                        <div class="notif-section">
+                            <div class="full-notif">
+                                <p class="time">1:33p, thurday </p>
+                                <p class="notif">someone is on camera</p>
+                            </div>
+                        </div>
+                        <div class="input-number">
+                            <p>Add your number to receive text messages too!</p>
+                            <div class="add-number">
+                                <input type="text" id="number" placeholder="000-000-0000">
+                                <button id="submit-number">Submit</button>
+                            </div>                            
                         </div>
                     </div>
                 </div>
                 <h3 class="logout">Log Out</h3>
             </div>
                 <h1>Security Camera</h1>
-                <button><a href="">Recordings</a></button>
+                <button>Gallery</button>
             </div>
     </header>
     <section class="main">
@@ -44,7 +52,7 @@
                     
                     <div class="control">
                         <p class="status" id="black-and-white-status"></p>
-                        <button id="black-and-white">Black and White</button>
+                        <button id="black-and-white">Refresh</button>
                     </div>
                     
                 </div>
@@ -55,9 +63,30 @@
             
         </div>
         <div class="video-feed">
-            <h3>Live Feed</h3>
-            <div class="video"><img id="img" src="http://127.0.0.1:8000/video"  alt=""></div>
-            
+            <div class="live-feed-header">
+                <div class="streaming-options">
+                    <div class="ie">
+                        
+                    </div>
+                    <h4>URL Format  </h4>
+                    <button>http</button>
+                    <button>rtsp</button>
+                    <h4>URL Parameter  </h4>
+                    <button>video</button>
+                    <button>mjpeg</button>
+                    <button>jpeg</button>
+                    <button>stream</button>
+                </div>
+            </div>
+                <div class="video"><img id="img" src=""  alt=""></div>
+            <div class="video-footer">
+                <p class="chosen-camera"></p>
+                <div class="video-buttons">
+                    <button>Snap Picture</button>
+                    <button>Record</button>
+                </div>
+                <p class="recording"></p>
+            </div>
         </div>
     </section>
     <script src="app.js"></script>
