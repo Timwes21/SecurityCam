@@ -66,7 +66,7 @@ def stream_puter():
     while True:
         success, frame = cap.read()
         if not success:
-            break
+            print("not having success")
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
 

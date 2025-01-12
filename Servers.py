@@ -8,6 +8,7 @@ import json
 app = FastAPI()
 
 me = User("timwes21", "jordan18")
+me.cameras["house"] = "2145678"
 users = [me]
 
 
@@ -20,47 +21,16 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all HTTP headers.
 )
 
-@app.get("/notifs")
-async def get_notifications():
-    return notifications_and_times
 
-
-
-@app.post("/cameras")
+@app.post("/add-camera")
 async def video_feed(request: Request):
     data = await request.json()
-    ip_address = data["ip_address"]
     username = data["username"]
+    ip_address = data["camera"][0]
+    camera_name = data["camera"][1]
     for user in users:
         if user.username == username:
-            user.add_camera(ip_address)
-            user.activate_camera()
-
-
-
-@app.post("/phone-number")
-async def phone_numbers(request: Request):
-    data = await request.json()
-    username = data["username"]
-    phone_number = data["phone_number"]
-    for user in users:
-        if user.username == username:
-            user.phone_number = phone_number
-
-@app.post("/buttons")
-async def button_pressed(request: Request):
-    data = await request.json()
-    username = data["username"]
-    button_pressed = data["button_pressed"]
-    for user in users:
-        if user.username == username:
-            if button_pressed == "refresh":
-                user.refresh_cameras()
-            elif button_pressed == "notif switch":
-                user.set_notifications()
-            elif button_pressed == "fr switch":
-                user.facial_recogintion()
-            break
+            user.add_camera(ip_address, camera_name)
 
 @app.post("/login")
 async def login(request: Request):
@@ -79,21 +49,14 @@ async def new_user(request: Request):
     new_user = User(data["username"], data["password"])
     users.append(new_user)
 
-@app.post("/add-face")
-async def add_face(request: Request):
-    data = await request.json()
-    username = data['username']
-    person = data['person']
-    image_count = data['image_count']
-    model_path = train_model(username, person, image_count)
+@app.get("/load-camera")
+def load_camera():
+    cameras = {}
     for user in users:
-        if user.username == username:
-            user.model_paths[person] = model_path
-
-@app.get("/test")
-async def video():
-    return StreamingResponse(stream_puter(), media_type="multipart/x-mixed-replace; boundary=frame")
-
+        username = user.username
+        user_cameras = user.cameras
+        cameras[username] = user_cameras
+    return cameras
 
 
 
