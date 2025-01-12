@@ -5,10 +5,8 @@ const loginPage = "login.html"
 const createAccountPage = "createaccount.html"
 const loginApi = "http://127.0.0.1:8000/login"
 const createAccountApi = "http://127.0.0.1:8000/new-user"
-const buttonApi = "http://127.0.0.1:8000/buttons"
-const numberApi = "http://127.0.0.1:8000/phone-number"
-const cameraApi = "http://127.0.0.1:8000/cameras"
-const testApi = "http://127.0.0.1:8000/test"
+const cameraApi = "http://127.0.0.1:8000/add-camera"
+const loadCameraApi = "http://127.0.0.1:8000/load-camera"
 
 
 if (localStorage.getItem("login") === null || localStorage.getItem("login") === "false"){
@@ -45,7 +43,7 @@ if (localStorage.getItem("login") === null || localStorage.getItem("login") === 
                         console.log(data);
                         
                         if (data.message === "Login successful!") {
-                            loadHomeState()
+                            loadHomeState(username)
                             localStorage.setItem("login", "true");
                             localStorage.setItem("username", username);
                         } else if (data.message === "Login failed!") {
@@ -165,7 +163,7 @@ function addNumber(){
     })
 }
 
-function addCamera(){
+function addCamera(username){
     let add_camera_button = document.querySelector(".add-camera")
     let cameras = {
 
@@ -174,113 +172,90 @@ function addCamera(){
     
     add_camera_button.addEventListener("click", () => {
         let inputDiv = document.createElement("div")
-        let input = document.createElement("input")
+        let inputIP = document.createElement("input")
+        let inputCameraName = document.createElement("input")
         let inputButton = document.createElement("button")
         let cancelButton = document.createElement("button")
-        let puterButton = document.createElement('button')
         
         cancelButton.innerText = "Cancel"
         inputButton.innerText = "Submit"
-        puterButton.innerText = "Computer Camera"
         
-        input.setAttribute("type", "text")
-        input.setAttribute("placeholder", "Enter camera ip address")
-        inputDiv.appendChild(input)
+        inputIP.setAttribute("type", "text")
+        inputIP.setAttribute("placeholder", "Camera ip address")
+        inputCameraName.setAttribute("type", "text")
+        inputCameraName.setAttribute("placeholder", "Camera Name")
+        inputDiv.appendChild(inputIP)
         document.querySelector(".input-ip").appendChild(inputDiv)
+        document.querySelector(".input-ip").appendChild(inputCameraName)
         document.querySelector(".input-ip").appendChild(inputButton)
         document.querySelector(".input-ip").appendChild(cancelButton)
-        document.querySelector(".input-ip").appendChild(puterButton)
+        
         
 
         cancelButton.addEventListener("click", () => {
             document.querySelector(".input-ip").removeChild(inputDiv)
             document.querySelector(".input-ip").removeChild(inputButton)
             document.querySelector(".input-ip").removeChild(cancelButton)
-            document.querySelector(".input-ip").removeChild(puterButton)
+            document.querySelector(".input-ip").removeChild(inputCameraName)
         })
 
 
         inputButton.addEventListener("click", () => {
-            if(input.value.length > 1){
+            if(inputIP.value.length > 1 && inputCameraName.value.length > 1){
                 let cameraButton = document.createElement("button")
-                cameras = JSON.parse(localStorage.getItem("cameras")) || {}
-                let cameraNumber = Object.keys(cameras).length+1
-                cameraButton.innerText = `Cameraa ${cameraNumber}` 
-                cameraButton.id = `camera-${cameraNumber}`
-                cameras[cameraButton.id] = input.value
-                localStorage.setItem("cameras", JSON.stringify(cameras))
-                console.log(localStorage.getItem("cameras"));
+                cameraButton.innerText = inputCameraName
+    
                 
                 document.querySelector(".camera-buttons").appendChild(cameraButton)
                 document.querySelector(".input-ip").removeChild(inputDiv)
                 document.querySelector(".input-ip").removeChild(inputButton)
-                document.querySelector(".input-ip").removeChild(puterButton)
+                document.querySelector(".input-ip").removeChild(cancelButton)
 
                 fetch(cameraApi, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ username: username, ip_address: password })
+                    body: JSON.stringify({ username: localStorage.getItem("username"), camera: [inputIP.value, inputCameraName.value]})
                 })
+                location.reload()
+                
             }
             else{
-                alert("Please enter an ip address")
+                alert("Please provide a name and ip address for the camera")
             }
 
         })
 
-        puterButton.addEventListener("click", () => {
+
+    })
+}
+
+
+
+function loadCamera(username){
+    fetch(loadCameraApi)
+    .then(response => response.json())
+    .then(data => {
+        let userCameras = data[localStorage.getItem("username")]
+        console.log(userCameras);
+        let camera_names = Object.keys(userCameras)
+        camera_names.forEach(camera => {
+            let button = document.createElement("button")
+            button.innerText = camera
+            document.querySelector(".camera-buttons").appendChild(button)
+
+        })
+
+        
+        
             
-            fetch(cameraApi, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ username: username, ip_address: "puter" })
-            })
         })
-
-
-    })
-}
-
-function loadCameraButtons(){
-    let cameras = JSON.parse(localStorage.getItem("cameras"))
-    let cameraButtons = document.querySelector(".camera-buttons")
-    let n = 1
-    Object.keys(cameras).forEach(camera => {
-        let cameraButton = document.createElement("button")
-        cameraButton.innerText = `camera ${n}`
-        cameraButton.id = camera
-        cameraButtons.appendChild(cameraButton)
-        n++
-        cameraButton.addEventListener("click", () => {
-
-        })
-    })
-}
-
-function loadCameraFeed(){
-    let videoImg = document.querySelector("#img")    
-
-    let cameras = JSON.parse(localStorage.getItem("cameras"))
-    Object.keys(cameras).forEach(camera => {
-        let cameraButton = document.querySelector(`#${camera}`)
-        cameraButton.addEventListener("click", () => {
-            localStorage.setItem("videoURL", cameras[camera])
-        })
-    })
-    
-    videoImg.src = localStorage.getItem("videoURL")
-}
-
-function chooseCameraFormat(){
-    
+        
 }
 
 
-function loadHomeState(){
+function loadHomeState(username){
     fetch("home.html")
         .then(response => response.text())
         .then(page => {
@@ -320,8 +295,7 @@ function loadHomeState(){
             press_button(bw_button, bw_status, bw_switch)
 
             addCamera()
-            loadCameraButtons()
-            loadCameraFeed()
+            loadCamera(username)
 
 
             fetch("http://127.0.0.1:8000/notifs")
