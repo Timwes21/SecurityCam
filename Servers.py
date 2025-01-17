@@ -1,15 +1,21 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request, Response, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from Security_Camera import stream, notifications_and_times, stream_puter
 from users import User
+from Camera import Camera, stream
+import threading
 import json
+import cv2
+camera_added = False
+
 
 app = FastAPI()
 
 me = User("timwes21", "jordan18")
-me.cameras["house"] = "2145678"
+# camera1 = Camera("132", "2145678", "house")
+# me.cameras.append(camera1)
 users = [me]
+
 
 
 
@@ -26,11 +32,14 @@ app.add_middleware(
 async def video_feed(request: Request):
     data = await request.json()
     username = data["username"]
-    ip_address = data["camera"][0]
-    camera_name = data["camera"][1]
+    ip_addrress = data['camera'][0]
+    camera_name = data['camera'][1]
+    port = data['camera'][2]
+    camera = Camera(username, camera_name, ip_addrress, port)
     for user in users:
-        if user.username == username:
-            user.add_camera(ip_address, camera_name)
+        if username == user.username:
+            user.cameras.append(camera)
+    camera.start()
 
 @app.post("/login")
 async def login(request: Request):
@@ -51,18 +60,34 @@ async def new_user(request: Request):
 
 @app.get("/load-camera")
 def load_camera():
-    cameras = {}
+    list_of_cameras = []
+    user_cameras = {}
     for user in users:
         username = user.username
-        user_cameras = user.cameras
-        cameras[username] = user_cameras
-    return cameras
+        cameras = user.cameras
+        for camera in cameras:
+            list_of_cameras.append(camera.name)
+        user_cameras[username] = list_of_cameras
+    return user_cameras
 
 
+@app.post("/delete-camera")
+async def delete_camera(request: Request):
+    data = await request.json()
+    username = data["username"]
+    camera = data["camera"]
+    for user in users:
+        if user.username == username:
+            user.delete_camera(camera)
 
 
-
-
+@app.get("/camera/{username}/{camera_name}")
+def cam(username: str, camera_name: str):
+        for user in users:
+            if user.username == username:
+                for camera in user.cameras:
+                    if camera.name == camera_name:
+                        return StreamingResponse(stream(camera), media_type="multipart/x-mixed-replace; boundary=frame")
     
 
 if __name__ == "__main__":

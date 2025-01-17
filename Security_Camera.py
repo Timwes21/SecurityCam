@@ -3,6 +3,8 @@ import asyncio
 import json
 import datetime
 import time
+from telegram import send_message
+import base64
 
 
 
@@ -23,16 +25,16 @@ cap = cv2.VideoCapture(0)
 # API key: SecurityBotChat
         
         
-def facial_rec(image_path, labels, person):
+def facial_rec(frame, cam):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_classifier.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-    
+    if len(faces) > 1:
+        send_message(f"someone detected {cam}")
     
 def manage_notifications(later, now, desired_amount_of_notifs, camera_number):
     if len(people_detected) > 0 and later < now:
         notif = f"People detected: {people_detected} on camera {camera_number}"
         time_of_notif = datetime_function.strftime("%Y-%m-%d %H:%M:%S")
-        notifications.append(notif)
         time_of_notifs.append(time_of_notif)
         send_message(notif)
         people_detected.clear()
@@ -46,31 +48,21 @@ def manage_notifications(later, now, desired_amount_of_notifs, camera_number):
 
 
 
-async def stream(ip_address, camera_number):
+def stream(ip_address, port):
     now = time.perf_counter()
     later = now + wait_period
-    cap = cv2.VideoCapture(f"http://{ip_address}/video")
+    cap = cv2.VideoCapture(f"http://{ip_address}:{port}/video")
     while True:
-        now = time.perf_counter()
         ret, frame = cap.read()
-        if not ret:
-            print("Failed to grab frame")
-            continue
+        now = time.perf_counter()
+        # facial_rec(frame)
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         
-        later = manage_notifications(later, now, 20, camera_number)
+        
+        
         
  
 
-def stream_puter():
-    cap = cv2.VideoCapture(0)
-    while True:
-        success, frame = cap.read()
-        if not success:
-            print("not having success")
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-
-        print("computer camera is being streamedS")
-
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
