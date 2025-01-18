@@ -5,10 +5,7 @@ import threading
 
 class User:
     cameras = []
-    generating = []
-    notifications = []
-    phone_number = ""
-    model_paths = {}
+    photos = {}
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -18,5 +15,8 @@ class User:
         # thread = threading.Thread(target=stream, args=(ip_address, port))
         # thread.start()
 
-    def delete_camera(self, camera):
-        self.cameras.pop(camera)
+    def delete_camera(self, camera_name):
+        for cam in self.cameras:
+            if cam.name == camera_name:
+                cam.stop()
+                self.cameras.remove(cam)

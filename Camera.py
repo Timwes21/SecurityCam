@@ -24,7 +24,7 @@ class Camera:
             ret, frame = self.cap.read()
             if ret:
                 if self.frame_queue.full():
-                    self.frame_queue.get()  # Drop the oldest frame
+                    self.frame_queue.get() 
                 self.frame_queue.put(frame)
 
     def get_frame(self):
@@ -34,6 +34,9 @@ class Camera:
         self.running = False
         self.thread.join()
         self.cap.release()
+
+
+
 
 
 def stream(video):
@@ -46,3 +49,13 @@ def stream(video):
             ret, buffer = cv2.imencode('.jpg', display_frame)
             yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+            
+def snap(video):
+    while True:
+        frame = video.get_frame()
+        if frame is not None:
+            # Duplicate frame
+            display_frame = frame.copy()
+
+            ret, buffer = cv2.imencode('.jpg', display_frame)
+            return buffer.tobytes()

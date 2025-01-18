@@ -2,8 +2,8 @@ from fastapi import FastAPI, HTTPException, Request, Response, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from users import User
-from Camera import Camera, stream
-import threading
+from Camera import Camera, stream, snap
+import datetime
 import json
 import cv2
 camera_added = False
@@ -16,8 +16,8 @@ me = User("timwes21", "jordan18")
 # me.cameras.append(camera1)
 users = [me]
 
-
-
+# for getting real time updates to send the users camera name for the buttons
+cameras = {"timwes21" :{}}
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,6 +39,8 @@ async def video_feed(request: Request):
     for user in users:
         if username == user.username:
             user.cameras.append(camera)
+            cameras[username].append(camera_name)
+            user.photos[camera_name] = []
     camera.start()
 
 @app.post("/login")
@@ -57,18 +59,11 @@ async def new_user(request: Request):
     data = await request.json()
     new_user = User(data["username"], data["password"])
     users.append(new_user)
+    cameras[new_user.username] = []
 
 @app.get("/load-camera")
 def load_camera():
-    list_of_cameras = []
-    user_cameras = {}
-    for user in users:
-        username = user.username
-        cameras = user.cameras
-        for camera in cameras:
-            list_of_cameras.append(camera.name)
-        user_cameras[username] = list_of_cameras
-    return user_cameras
+    return cameras
 
 
 @app.post("/delete-camera")
@@ -79,6 +74,8 @@ async def delete_camera(request: Request):
     for user in users:
         if user.username == username:
             user.delete_camera(camera)
+    if camera in cameras[username]:
+        cameras[username].remove(camera)
 
 
 @app.get("/camera/{username}/{camera_name}")
@@ -89,6 +86,25 @@ def cam(username: str, camera_name: str):
                     if camera.name == camera_name:
                         return StreamingResponse(stream(camera), media_type="multipart/x-mixed-replace; boundary=frame")
     
+
+@app.get("/snap/{username}/{camera_name}")
+def snap_pic(username: str, camera_name: str):
+    for user in users:
+            if user.username == username:
+                for camera in user.cameras:
+                    if camera.name == camera_name:
+                        time_of_image = datetime.datetime.now()
+                        user.photos[camera_name].append(snap(camera))
+                        user.photos[camera_name].append(time_of_image)
+                        return Response(snap(camera), media_type="image/jpeg")
+
+@app.get("/photos/{username}")
+def get_user_photos(username: str):
+    for user in users:
+        if user.username == username:
+            return user.photos
+
+
 
 if __name__ == "__main__":
     import uvicorn
