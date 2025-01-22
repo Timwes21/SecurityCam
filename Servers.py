@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from users import User
 from Camera import Camera, stream, snap
 import datetime
-import json
+import base64
 import cv2
 camera_added = False
 
@@ -17,7 +17,7 @@ me = User("timwes21", "jordan18")
 users = [me]
 
 # for getting real time updates to send the users camera name for the buttons
-cameras = {"timwes21" :{}}
+cameras = {"timwes21" :[]}
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,7 +40,6 @@ async def video_feed(request: Request):
         if username == user.username:
             user.cameras.append(camera)
             cameras[username].append(camera_name)
-            user.photos[camera_name] = []
     camera.start()
 
 @app.post("/login")
@@ -93,9 +92,10 @@ def snap_pic(username: str, camera_name: str):
             if user.username == username:
                 for camera in user.cameras:
                     if camera.name == camera_name:
-                        time_of_image = datetime.datetime.now()
-                        user.photos[camera_name].append(snap(camera))
-                        user.photos[camera_name].append(time_of_image)
+                        now = datetime.datetime.now()
+                        formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
+                        encoed_image = base64.b64encode(snap(camera)).decode('utf-8')
+                        user.photos.append((encoed_image, camera_name, formatted_datetime))
                         return Response(snap(camera), media_type="image/jpeg")
 
 @app.get("/photos/{username}")
@@ -103,6 +103,13 @@ def get_user_photos(username: str):
     for user in users:
         if user.username == username:
             return user.photos
+        
+@app.get("/buttons/{username}/{button}")
+def buttons(username: str, button: str):
+    for user in users:
+        if user.username == username:
+            if button == "black and white":
+                user.black_and_white = not user.black_and_white
 
 
 
