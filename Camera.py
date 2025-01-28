@@ -13,7 +13,7 @@ class Camera:
         self.username = username
         self.name = name
         self.running = True
-        self.black_and_white = False
+        self.black_and_white = True
         self.frame_queue = queue.Queue(maxsize=10)
         self.thread = threading.Thread(target=self.update, daemon=True)
 
@@ -26,13 +26,15 @@ class Camera:
             if ret:
                 if self.black_and_white:
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                    frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
                 if self.frame_queue.full():
                     self.frame_queue.get() 
                 self.frame_queue.put(frame)
 
     def get_frame(self):
         return self.frame_queue.get()
+    
+    def b_w_switch(self):
+        self.black_and_white = not self.black_and_white
 
     def stop(self):
         self.running = False

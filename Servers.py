@@ -104,13 +104,21 @@ def get_user_photos(username: str):
         if user.username == username:
             return user.photos
         
-@app.get("/buttons/{username}/{button}")
-def buttons(username: str, button: str):
+@app.post("/buttons")
+async def buttons(request: Request):
+    data = await request.json()
+    username = data["username"]
+    button = data["buttonPressed"]
+    camera_name = data["camera"]
     for user in users:
         if user.username == username:
-            if button == "black and white":
-                user.black_and_white = not user.black_and_white
+            for camera in user.cameras:
+                if camera.name == camera_name:
+                    if button == "Black and White":
+                        camera.black_and_white = not camera.black_and_white
 
+
+@app.get("/")
 
 
 if __name__ == "__main__":
