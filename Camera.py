@@ -33,8 +33,13 @@ class Camera:
     def get_frame(self):
         return self.frame_queue.get()
     
-    def b_w_switch(self):
-        self.black_and_white = not self.black_and_white
+    def switch(self, button):
+        if button == "Black and White":
+            self.black_and_white = not self.black_and_white
+
+    def get_cam_info(self):
+        cam_info = {"name": self.name, "Black and White": self.black_and_white}
+        return cam_info
 
     def stop(self):
         self.running = False
