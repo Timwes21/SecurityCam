@@ -6,19 +6,24 @@ from Camera import Camera, stream, snap
 import datetime
 import base64
 from pydantic import BaseModel
-import cv2
-camera_added = False
+import bcrypt
 
-def find_user(users, username):
+def find_user(users: list, username: str) -> User:
     for user in users:
             if user.username == username:
                 return user
             
-def find_camera(user, camera_name):
+def find_camera(user: User, camera_name: str) -> Camera:
     for camera in user.cameras:
             if camera.name == camera_name:
                 return camera
+            
+def encrypt_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
 class UserModel(BaseModel):
@@ -36,6 +41,11 @@ class ButtonsModel(BaseModel):
     username: str
     button: str
     camera_name: str
+
+class new_known_face(BaseModel):
+    name: str
+
+
 
 
 app = FastAPI()
@@ -63,13 +73,14 @@ async def video_feed(cam: CameraModel):
 @app.post("/login")
 async def login(possible_user: UserModel):
     for user in users:
-        if user.username == possible_user.username and user.password == possible_user.password:
+        if user.username == possible_user.username and verify_password(possible_user.password, user.password):
             return "Login successful!"
     raise HTTPException(status_code=404, detail="Login Not Successful")
 
 @app.post("/new-user")
 async def new_user(user: UserModel):
-    new_user = User(user.username, user.password)
+    password = encrypt_password(user.password)
+    new_user = User(user.username, password)
     users.append(new_user)
 
 @app.get("/load-camera/{username}")
@@ -81,11 +92,8 @@ def load_camera(username: str):
     return cameras
 
 
-@app.post("/delete-camera")
-async def delete_camera(request: Request):
-    data = await request.json()
-    username = data["username"]
-    camera = data["camera"]
+@app.post("/delete-camera/{username}/{camera}")
+async def delete_camera(username: str, camera: str):
     user = find_user(users, username)
     user.delete_camera(camera)
 
@@ -117,6 +125,21 @@ async def buttons(button: ButtonsModel):
     user = find_user(users, button.username)
     camera = find_camera(user, button.camera_name)
     camera.switch(button.button_pressed)
+
+
+@app.get("/recognized-face/{username}/{camera_name}")
+def recognized_faces(username: str, camera_name: str):
+    user = find_user(users, username)
+    camera = find_camera(user, camera_name)
+    return camera.get_faces()
+
+@app.post("/add-people/{username}/{camera_name}")
+async def add_people(username: str, camera_name: str, person: new_known_face):
+    user = find_user(users, username)
+    camera = find_camera(user, camera_name)
+    user.add_people(person.name, snap(camera))
+
+    
 
 
 

@@ -6,7 +6,7 @@ import threading
 class User:
     cameras = []
     photos = []
-    black_and_white = False
+    people = {}
     def __init__(self, username, password):
         self.username = username
         self.password = password
@@ -20,3 +20,7 @@ class User:
             if cam.name == camera_name:
                 cam.stop()
                 self.cameras.remove(cam)
+
+    def add_people(self, name, picture):
+        for camera in self.cameras:
+            camera.add_person(name, picture)

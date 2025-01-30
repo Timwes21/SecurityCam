@@ -1,19 +1,24 @@
 import cv2
-import time
-from Security_Camera import facial_rec
-import pickle
 import threading
 import queue
-from telegram import send_message
+from facial_rec import add_known_persons, recognize_faces
+import cv2
+from insightface.app import FaceAnalysis
+from insightface.data import get_image as ins_get_image
 
+app = FaceAnalysis(name='buffalo_1')
+app.prepare(ctx_id=0, det_size=(640, 640))
 
 class Camera:
+    known_faces = {}
+    face_names = None
     def __init__(self, username, name, ip, port):
         self.cap = cv2.VideoCapture(f"http://{ip}:{port}/video")
         self.username = username
         self.name = name
         self.running = True
         self.black_and_white = True
+        self.facial_rec = False
         self.frame_queue = queue.Queue(maxsize=10)
         self.thread = threading.Thread(target=self.update, daemon=True)
 
@@ -23,6 +28,10 @@ class Camera:
     def update(self):
         while self.running:
             ret, frame = self.cap.read()
+
+            if self.facial_rec:
+                self.face_names = recognize_faces(frame, self.known_face_encodings, self.known_face_names)
+
             if ret:
                 if self.black_and_white:
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -33,6 +42,9 @@ class Camera:
     def get_frame(self):
         return self.frame_queue.get()
     
+    def get_faces(self):
+        return self.face_names
+    
     def switch(self, button):
         if button == "Black and White":
             self.black_and_white = not self.black_and_white
@@ -40,6 +52,10 @@ class Camera:
     def get_cam_info(self):
         cam_info = {"name": self.name, "Black and White": self.black_and_white}
         return cam_info
+    
+    def add_person(self, name, picture):
+        known_person, known_embinng = add_known_persons(name, picture)
+        self.known_faces[known_person] = known_embinng
 
     def stop(self):
         self.running = False
@@ -71,4 +87,3 @@ def snap(video):
             ret, buffer = cv2.imencode('.jpg', display_frame)
             return buffer.tobytes()
         
-
