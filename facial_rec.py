@@ -1,27 +1,12 @@
-import cv2
 import numpy as np
-from insightface.app import FaceAnalysis
+from deepface import DeepFace
+import os
 
-app = FaceAnalysis(name='buffalo_1', providers=['CPUExecutionProvider'])
-app.prepare(ctx_id=0, det_size=(640, 640))
-
-
-def add_known_person(name: str, image_bytes: bytes):
-    known_face_encodings = []
-    known_face_names = []
-
-    nparr = np.frombuffer(image_bytes, np.uint8)
-    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    faces = app.get(image)
-    if faces:
-        known_face_encodings.append(faces[0].embedding)
-        known_face_names.append(name)
-
-    return known_face_encodings, known_face_names
-
+def add_new_person(username, person):
+    os.makedirs(f"faces/{username}/{person}/", exist_ok=True)
 
 def recognize_faces(frame, known_faces):
-    faces = app.get(frame)
+    faces = handler.get(frame)
     face_names = []
     known_face_names = []
     known_face_encodings = []

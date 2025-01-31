@@ -7,6 +7,7 @@ import datetime
 import base64
 from pydantic import BaseModel
 import bcrypt
+from photos import Photo
 
 def find_user(users: list, username: str) -> User:
     for user in users:
@@ -17,6 +18,11 @@ def find_camera(user: User, camera_name: str) -> Camera:
     for camera in user.cameras:
             if camera.name == camera_name:
                 return camera
+            
+def current_time():
+    now = datetime.datetime.now()
+    formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
+    return formatted_datetime
             
 def encrypt_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -39,7 +45,7 @@ class CameraModel(BaseModel):
 
 class ButtonsModel(BaseModel):
     username: str
-    button: str
+    button_pressed: str
     camera_name: str
 
 class new_known_face(BaseModel):
@@ -109,15 +115,19 @@ def cam(username: str, camera_name: str):
 def snap_pic(username: str, camera_name: str):
     user = find_user(users, username)
     camera = find_camera(user, camera_name)
-    now = datetime.datetime.now()
-    formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
-    encoed_image = base64.b64encode(snap(camera)).decode('utf-8')
-    user.photos.append((encoed_image, camera_name, formatted_datetime))
     return Response(snap(camera), media_type="image/jpeg")
+
+@app.post("/save-photo/{username}")
+def save_photo(username: str, photo_encoded: str, camera_name: str):
+    user = find_user(users, username)
+    current_time = current_time()
+    photo = Photo(photo_encoded, current_time, camera_name)
+    user.photos.append(photo)
 
 @app.get("/photos/{username}")
 def get_user_photos(username: str):
     user = find_user(users, username)
+
     return user.photos
         
 @app.post("/buttons")
