@@ -30,10 +30,23 @@
                 </div>
                 <h3 class="logout">Log Out</h3>
             </div>
-                <h1>Security Camera</h1>
-                <button>Gallery</button>
-            </div>
+            <h1>Security Camera</h1>
+            <button class="gallery-button">Gallery</button>
+        </div>
     </header>
+    <div class="gallery">
+        <h2 id="main-gallery-heading">Gallery v</h2>
+        <hr>
+        <div id="main-gallery" class="gallery-section">
+            <div class="picture">
+                <img src="sorry2.jpg" alt="">
+                <div class="photo-info">
+                    <h4 class="camera-name">iphone camera</h4>
+                    <p class="date-time">sunday 6pm</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <section class="main">
         <div class="buttons-controls">
             
@@ -52,40 +65,28 @@
                     
                     <div class="control">
                         <p class="status" id="black-and-white-status"></p>
-                        <button id="black-and-white">Refresh</button>
+                        <button id="black-and-white">Black and White</button>
                     </div>
                     
                 </div>
                 <h2>Cameras</h2>
                 <button class="add-camera" id="add-cam">Add a Camera</button>
-                <div class="input-ip"></div>
+                <div class="input"></div>
                 <div class="camera-buttons"></div>
+                <button class="delete-camera">Delete Camera</button>
             
         </div>
         <div class="video-feed">
             <div class="live-feed-header">
-                <div class="streaming-options">
-                    <div class="ie">
-                        
-                    </div>
-                    <h4>URL Format  </h4>
-                    <button>http</button>
-                    <button>rtsp</button>
-                    <h4>URL Parameter  </h4>
-                    <button>video</button>
-                    <button>mjpeg</button>
-                    <button>jpeg</button>
-                    <button>stream</button>
-                </div>
+                <p class="frame-showed"></p>
             </div>
                 <div class="video"><img id="img" src=""  alt=""></div>
             <div class="video-footer">
                 <p class="chosen-camera"></p>
                 <div class="video-buttons">
-                    <button>Snap Picture</button>
-                    <button>Record</button>
+                    <button id="snap">Snap Picture</button>
                 </div>
-                <p class="recording"></p>
+                <p class="message-to-user"></p>
             </div>
         </div>
     </section>

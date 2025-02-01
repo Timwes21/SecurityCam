@@ -254,7 +254,13 @@ body{
     border: 0;
     width: 150px;
 }
-.input-ip button{
+.input-text-boxes{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.input button{
     width: 75px;
 }
 .camera-buttons{
@@ -266,6 +272,14 @@ body{
 .camera-buttons button{
     width: 80px;
     
+}
+.input-text-boxes{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.delete-camera{
+    margin: 5px;
 }
 .video-feed{
     background: linear-gradient(to bottom right, rgb(0, 0, 0), rgb(0, 0, 0));
@@ -280,16 +294,17 @@ body{
 }
 .live-feed-header{
     display: flex;
+    height: 30px;
+    color: white;
     font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.frame-showed{
+    color: white;
 }
 .streaming-options{
     display: flex;
     color: white;
     align-items: center;
-}
-.streaming-options button{
-    background-color: grey;
-    padding: 5px;
 }
 .video-feed h3{
     color: white;
@@ -301,6 +316,10 @@ body{
     font-size: small;
     
     
+}
+.video-buttons{
+    /* position:absolute; */
+    visibility: ;
 }
 .video-buttons button{
     border: 0;
@@ -325,7 +344,7 @@ body{
 .video-footer{
     height: 35px;
     display: flex;
-    justify-content:center;
+    justify-content:space-evenly;
     align-items: center;
     gap: 35px;
     color: white;
@@ -340,3 +359,54 @@ body{
     color: white;
     
 }
+
+.gallery {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    position: fixed; /* Fixed position */
+    align-items: center;
+    transition: opacity 0.5s ease, max-height 0.5s ease;
+    /* visibility: hidden; */
+    right: 0;
+    width: 30vw; /* 25% of viewport width */
+    height: 100vh; /* 25% of viewport height */
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    color: white; /* Text color */
+    overflow-y: auto; /* Scrollable content */
+    z-index: 1000; /* Ensure it is above other elements */
+    padding: 10px; /* Padding for content */
+    overflow: scroll;
+}
+#main-gallery-heading{
+    cursor: pointer;
+}
+.gallery-section{
+    display:none;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.photo {
+    display: flex;
+    align-items: center;
+}
+.photo-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.photo-footer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 10px;
+}
+.photo-footer button{
+    background-color: rgb(198, 0, 0);
+    border: 0;
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+}
+
