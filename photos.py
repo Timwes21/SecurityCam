@@ -3,3 +3,6 @@ class Photo:
         self.photo = photo_encoded
         self.time = time
         self.camera_name = camera_name
+
+    def to_list(self):
+        return [self.photo, self.time, self.camera_name]

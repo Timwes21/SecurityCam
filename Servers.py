@@ -98,7 +98,7 @@ def load_camera(username: str):
     return cameras
 
 
-@app.post("/delete-camera/{username}/{camera}")
+@app.get("/delete-camera/{username}/{camera}")
 async def delete_camera(username: str, camera: str):
     user = find_user(users, username)
     user.delete_camera(camera)
@@ -115,39 +115,41 @@ def cam(username: str, camera_name: str):
 def snap_pic(username: str, camera_name: str):
     user = find_user(users, username)
     camera = find_camera(user, camera_name)
+    encoded_image = base64.b64encode(snap(camera)).decode('utf-8')
+    user.set_temporary_photo(encoded_image, camera_name, current_time())
     return Response(snap(camera), media_type="image/jpeg")
 
-@app.post("/save-photo/{username}")
-def save_photo(username: str, photo_encoded: str, camera_name: str):
+@app.get("/save-photo/{username}/{name}")
+def save_photo(username: str, name: str):
     user = find_user(users, username)
-    current_time = current_time()
-    photo = Photo(photo_encoded, current_time, camera_name)
-    user.photos.append(photo)
+    user.save_photo(name)
 
-@app.get("/photos/{username}")
+
+@app.get("/gallery-photos/{username}")
 def get_user_photos(username: str):
+    photos = []
     user = find_user(users, username)
+    for photo in user.photos:
+        photos.append(photo.to_list())
+    return photos
 
-    return user.photos
-        
+@app.get("/people-photos/{username}")
+def get_people_photos(username: str):
+    user = find_user(users, username)
+    return user.get_people()
+
+@app.get("/delete-photo/{username}/{name}/{index}")
+async def delete_photo(username: str, name: str, index: int):
+    user = find_user(users, username)
+    user.delete_photo(name, index)
+
+
 @app.post("/buttons")
 async def buttons(button: ButtonsModel):
     user = find_user(users, button.username)
     camera = find_camera(user, button.camera_name)
     camera.switch(button.button_pressed)
 
-
-@app.get("/recognized-face/{username}/{camera_name}")
-def recognized_faces(username: str, camera_name: str):
-    user = find_user(users, username)
-    camera = find_camera(user, camera_name)
-    return camera.get_faces()
-
-@app.post("/add-people/{username}/{camera_name}")
-async def add_people(username: str, camera_name: str, person: new_known_face):
-    user = find_user(users, username)
-    camera = find_camera(user, camera_name)
-    user.add_people(person.name, snap(camera))
 
     
 
