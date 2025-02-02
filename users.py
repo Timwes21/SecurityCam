@@ -30,12 +30,19 @@ class User:
         self.recent_photo = [photo, time, camera_name]
 
     def get_people(self):
-        return self.people
+        peoples_photos = {}
+        for person in self.people:
+            peoples_photos[person] = []
+            for photo in self.people[person]:
+                peoples_photos[person].append(photo.to_list())
+        return peoples_photos
 
     def save_photo(self, name):
         photo = Photo(self.recent_photo[0], self.recent_photo[1], self.recent_photo[2]) 
         if name not in self.people:
             self.people[name] = [photo]
+        elif name == "gallery":
+            self.photos.append(photo)
         else: 
             self.people[name].append(photo)
 

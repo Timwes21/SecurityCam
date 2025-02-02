@@ -48,9 +48,6 @@ class ButtonsModel(BaseModel):
     button_pressed: str
     camera_name: str
 
-class new_known_face(BaseModel):
-    name: str
-
 
 
 
