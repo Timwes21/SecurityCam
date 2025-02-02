@@ -4,5 +4,7 @@ key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3
 supabase: Client = create_client(url, key)
 
 
-def save_picture(image_bytes):
-    supabase.storage.from_("images").upload(file_path, image_bytes, {"content-type": "image/jpeg"})
+def save_picture(username, image_bytes):
+    images = supabase.storage.from_("user-images").list(f"{username}/")
+    image_index = len(images) + 1
+    supabase.storage.from_("images").upload(f"{username}/image{image_index}.jpg", image_bytes, {"content-type": "image/jpeg"})
