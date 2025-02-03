@@ -112,14 +112,14 @@ def cam(username: str, camera_name: str):
 def snap_pic(username: str, camera_name: str):
     user = find_user(users, username)
     camera = find_camera(user, camera_name)
-    encoded_image = base64.b64encode(snap(camera)).decode('utf-8')
-    user.set_temporary_photo(encoded_image, camera_name, current_time())
+    image_bytes = snap(camera)
+    user.set_temporary_photo(image_bytes)
     return Response(snap(camera), media_type="image/jpeg")
 
-@app.get("/save-photo/{username}/{name}")
-def save_photo(username: str, name: str):
+@app.get("/save-photo/{username}")
+def save_photo(username: str):
     user = find_user(users, username)
-    user.save_photo(name)
+    user.save_photo()
 
 
 @app.get("/gallery-photos/{username}")
