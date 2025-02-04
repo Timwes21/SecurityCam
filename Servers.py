@@ -122,23 +122,10 @@ def save_photo(username: str):
     user.save_photo()
 
 
-@app.get("/gallery-photos/{username}")
-def get_user_photos(username: str):
-    photos = []
+@app.get("/people/{username}")
+def get_people(username: str):
     user = find_user(users, username)
-    for photo in user.photos:
-        photos.append(photo.to_list())
-    return photos
-
-@app.get("/people-photos/{username}")
-def get_people_photos(username: str):
-    user = find_user(users, username)
-    return user.get_people()
-
-@app.get("/delete-photo/{username}/{name}/{index}")
-async def delete_photo(username: str, name: str, index: int):
-    user = find_user(users, username)
-    user.delete_photo(name, index)
+    user.add_a_face()
 
 
 @app.post("/buttons")

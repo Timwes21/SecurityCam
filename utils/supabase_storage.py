@@ -7,4 +7,19 @@ supabase: Client = create_client(url, key)
 def save_picture(username, image_bytes):
     images = supabase.storage.from_("user-images").list(f"{username}/")
     image_index = len(images) + 1
-    supabase.storage.from_("images").upload(f"{username}/image{image_index}.jpg", image_bytes, {"content-type": "image/jpeg"})
+    supabase.storage.from_("Images").upload(f"{username}/image{image_index}.jpg", image_bytes, {"content-type": "image/jpeg"})
+
+def save_embedding(username, name, embedding):
+    supabase.table("user_embeddings")\
+    .update({"embedding": supabase.rpc('jsonb_set', 
+            ["embedding", f'"{name}"', embedding])})\
+            .eq("user_id", username)\
+        .execute()
+
+
+
+def get_embeddings(username):
+    response = supabase.table("user_embeddings").select("embeddings").eq("user_id", username).execute()
+    
+    if response['data']:
+        return response['data'][0]['embeddings']

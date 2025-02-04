@@ -1,27 +1,34 @@
-import numpy as np
 from deepface import DeepFace
-import os
+from PIL import Image
+import io
+from supabase_storage import get_embeddings, save_embedding
+from scipy.spatial.distance import cosine
 
-def add_new_person(username, person):
-    os.makedirs(f"faces/{username}/{person}/", exist_ok=True)
 
-def recognize_faces(frame, known_faces):
-    faces = handler.get(frame)
-    face_names = []
-    known_face_names = []
-    known_face_encodings = []
-    
-    for i, j in enumerate(known_faces):
-        known_face_names.append(i), known_face_encodings.append(j)
+def recognize_faces(frame, username):
+    frame_embedding = DeepFace.represent(frame, model_name="Facenet")[0]["embedding"]
 
-    
-    for face in faces:
-        distances = np.linalg.norm(known_face_encodings - face.embedding, axis=1)
-        min_distance_index = np.argmin(distances)
-        if distances[min_distance_index] < 1.0:  # Threshold for face recognition
-            name = known_face_names[min_distance_index]
-        else:
-            name = "Unknown"
-        face_names.append((face.bbox, name))
+    user_embeddings = get_embeddings(username) or {}
 
-    return face_names
+    best_match = None
+    best_distance = float('inf')
+    for name, stored_embedding in user_embeddings.items():
+        distance = cosine(frame_embedding, stored_embedding)
+        
+        if distance < best_distance:
+            best_distance = distance
+            best_match = name
+
+    if best_distance < 0.6:
+        return best_match
+    else:
+        return "unknown"
+
+def create_embedding(image_bytes, name, username):
+    image = Image.open(io.BytesIO(image_bytes))
+    embeddings = DeepFace.represent(img_path=image, model_name="Facenet")
+    save_embedding(username, name, embeddings[0]["embedding"])
+
+
+
+

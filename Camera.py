@@ -2,6 +2,7 @@ import cv2
 import threading
 import queue
 import cv2
+from utils.facial_rec import recognize_faces
 
 
 class Camera:
@@ -24,8 +25,8 @@ class Camera:
         while self.running:
             ret, frame = self.cap.read()
 
-            # if self.facial_rec:
-            #     self.face_names = recognize_faces(frame, self.known_face_encodings, self.known_face_names)
+            if self.facial_rec:
+                self.face_names = recognize_faces(frame, self.username)
 
             if ret:
                 if self.black_and_white:
