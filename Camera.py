@@ -4,10 +4,8 @@ import queue
 import cv2
 from utils.facial_rec import recognize_faces
 
-
 class Camera:
-    known_faces = {}
-    face_names = None
+    embeddings = {}
     def __init__(self, username, name, ip, port):
         self.cap = cv2.VideoCapture(f"http://{ip}:{port}/video")
         self.username = username
@@ -38,8 +36,8 @@ class Camera:
     def get_frame(self):
         return self.frame_queue.get()
     
-    def get_faces(self):
-        return self.face_names
+    def add_embeddings(self, embeding, name):
+        self.embeddings[name] = embeding
     
     def switch(self, button):
         if button == "Black and White":
@@ -49,9 +47,6 @@ class Camera:
         cam_info = {"name": self.name, "Black and White": self.black_and_white}
         return cam_info
     
-    # def add_person(self, name, picture):
-    #     known_person, known_embinng = add_known_persons(name, picture)
-    #     self.known_faces[known_person] = known_embinng
 
     def stop(self):
         self.running = False
@@ -84,10 +79,3 @@ def snap(video):
             return buffer.tobytes()
         
 
-def snap_jpg(video):
-    while True:
-        frame = video.get_frame()
-        if frame is not None:
-            # Further abstraction for caution
-            display_frame = frame.copy()
-            return display_frame

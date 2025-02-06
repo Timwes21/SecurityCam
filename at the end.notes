@@ -1,0 +1,4 @@
+- store users in a database
+- use websockets to manage user authentication
+- use the uuid library to make user sessions tokens
+- organize package

@@ -3,6 +3,7 @@ from utils.facial_rec import create_embedding
 
 class User:
     cameras = []
+    recognizable_people = []
     recent_photo = None
     def __init__(self, username, password):
         self.username = username
@@ -28,4 +29,9 @@ class User:
     def save_photo(self):
         save_picture(self.username, self.recent_photo)
         self.recent_photo = None 
+    
+    def get_embedings(self, name, files):
+        embeddings = create_embedding(files)
+        for camera in self.cameras:
+            camera.add_embeddings(name, embeddings)
         

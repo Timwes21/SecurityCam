@@ -1,13 +1,18 @@
-from fastapi import FastAPI, HTTPException, Request, Response, BackgroundTasks
+from fastapi import FastAPI, HTTPException, UploadFile, Response, WebSocket
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List, Dict
 from users import User
 from Camera import Camera, stream, snap
 import datetime
-import base64
+import asyncio
 from pydantic import BaseModel
 import bcrypt
-from photos import Photo
+from redis.asyncio import Redis
+
+r = Redis(host="localhost", port=6379, decode_responses=True)
+
+active_connections = {}
 
 def find_user(users: list, username: str) -> User:
     for user in users:
@@ -66,6 +71,23 @@ app.add_middleware(
 )
 
 
+@app.websocket("/detections/{username}/{camera}")
+async def detections(websocket: WebSocket, username: str, camera: str):
+    await websocket.accept()
+    channel = f"{username}:{camera}"
+    active_connections[channel] = websocket
+
+    sub = r.pubsub()
+    sub.subscribe(channel)
+    while True:
+        message = sub.get_message(True)
+        if message:
+            await websocket.send_text(message["data"])
+        await asyncio.sleep(0.1)
+
+
+
+
 @app.post("/add-camera")
 async def video_feed(cam: CameraModel):
     camera = Camera(cam.username, cam.name, cam.ip_address, cam.port)
@@ -122,10 +144,11 @@ def save_photo(username: str):
     user.save_photo()
 
 
-@app.get("/people/{username}")
-def get_people(username: str):
+@app.get("/people/{username}/{name_of_person}")
+def get_people(username: str, name_of_person: str):
     user = find_user(users, username)
-    user.add_a_face()
+    user.add_a_face(name_of_person)
+
 
 
 @app.post("/buttons")
@@ -134,6 +157,12 @@ async def buttons(button: ButtonsModel):
     camera = find_camera(user, button.camera_name)
     camera.switch(button.button_pressed)
 
+
+@app.post("/upload-photos/{username}")
+async def upload_photos(username: str, files: List[UploadFile]):
+    user = find_user(users, username)
+    user.add_a_face(files)
+    return {"message": "git the images!"}
 
     
 

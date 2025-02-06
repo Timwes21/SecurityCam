@@ -1,33 +1,38 @@
 from deepface import DeepFace
 from PIL import Image
 import io
-from supabase_storage import get_embeddings, save_embedding
 from scipy.spatial.distance import cosine
+import numpy as np
+from redis_channels import detection
 
 
-def recognize_faces(frame, username):
+def recognize_faces(frame, username, camera_name, user_embeddings):
     frame_embedding = DeepFace.represent(frame, model_name="Facenet")[0]["embedding"]
-
-    user_embeddings = get_embeddings(username) or {}
-
-    best_match = None
-    best_distance = float('inf')
+    on_screen = "unknown"
+    
+    
     for name, stored_embedding in user_embeddings.items():
         distance = cosine(frame_embedding, stored_embedding)
         
-        if distance < best_distance:
-            best_distance = distance
-            best_match = name
+        if distance < .06:
+            on_screen = name
 
-    if best_distance < 0.6:
-        return best_match
-    else:
-        return "unknown"
+    detection(username, camera_name, on_screen)
+    
+    
+    
 
-def create_embedding(image_bytes, name, username):
-    image = Image.open(io.BytesIO(image_bytes))
-    embeddings = DeepFace.represent(img_path=image, model_name="Facenet")
-    save_embedding(username, name, embeddings[0]["embedding"])
+def create_embedding(image_bytes_list):
+    
+    embeddings = []
+    for image_bytes in image_bytes_list:
+        image = Image.open(io.BytesIO(image_bytes))
+        embedding = DeepFace.represent(img_path=image, model_name="Facenet")[0]["embedding"]
+        embedding_array = np.array(embedding)
+        embeddings.append(embedding_array)
+
+    return np.mean(embeddings, axis=0)
+
 
 
 
