@@ -2,15 +2,15 @@ from fastapi import FastAPI, HTTPException, UploadFile, Response, WebSocket
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
-from users import User
 from Camera import Camera, stream, snap
-import datetime
 import asyncio
-from pydantic import BaseModel
-import bcrypt
-from redis.asyncio import Redis
+from users import User
+from utils import (
+    r,
+    encrypt_password, verify_password,
+    UserModel, ButtonsModel, CameraModel,
 
-r = Redis(host="localhost", port=6379, decode_responses=True)
+)
 
 active_connections = {}
 
@@ -23,45 +23,14 @@ def find_camera(user: User, camera_name: str) -> Camera:
     for camera in user.cameras:
             if camera.name == camera_name:
                 return camera
-            
-def current_time():
-    now = datetime.datetime.now()
-    formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
-    return formatted_datetime
-            
-def encrypt_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-
-
-class UserModel(BaseModel):
-    username: str
-    password: str
-
-
-class CameraModel(BaseModel):
-    username: str
-    ip_address: str
-    name: str
-    port: str
-
-class ButtonsModel(BaseModel):
-    username: str
-    button_pressed: str
-    camera_name: str
-
-
-
+        
 
 app = FastAPI()
 
 me = User("timwes21", "jordan18")
-users = [me]
-
-
+users = [me]        
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins. Replace "*" with specific domains if needed.
@@ -69,6 +38,9 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all HTTP methods.
     allow_headers=["*"],  # Allows all HTTP headers.
 )
+
+
+
 
 
 @app.websocket("/detections/{username}/{camera}")
@@ -79,11 +51,15 @@ async def detections(websocket: WebSocket, username: str, camera: str):
 
     sub = r.pubsub()
     sub.subscribe(channel)
-    while True:
-        message = sub.get_message(True)
-        if message:
-            await websocket.send_text(message["data"])
-        await asyncio.sleep(0.1)
+    try:
+        while True:
+            message = sub.get_message(True)
+            if message:
+                await websocket.send_text(message["data"])
+            await asyncio.sleep(0.1)
+    except:
+        del active_connections[channel]
+        sub.unsubscribe(channel)
 
 
 

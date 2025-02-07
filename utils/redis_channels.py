@@ -9,3 +9,5 @@ def notifications():
 def detection(username, camera, name_of_person):
     r.publish(f"{username}:{camera}", name_of_person)
 
+def get_detection(username, camera):
+    return r.get(f"{username}:{camera}")

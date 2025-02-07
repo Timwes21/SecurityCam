@@ -2,12 +2,12 @@ import cv2
 import threading
 import queue
 import cv2
-from utils.facial_rec import recognize_faces
+from utils import recognize_faces
 
 class Camera:
     embeddings = {}
     def __init__(self, username, name, ip, port):
-        self.cap = cv2.VideoCapture(f"http://{ip}:{port}/video")
+        self.cap = cv2.VideoCapture(0)
         self.username = username
         self.name = name
         self.running = True
@@ -24,7 +24,7 @@ class Camera:
             ret, frame = self.cap.read()
 
             if self.facial_rec:
-                self.face_names = recognize_faces(frame, self.username)
+                self.face_names = recognize_faces(frame, self.username, self.name, self.embeddings)
 
             if ret:
                 if self.black_and_white:
@@ -42,10 +42,11 @@ class Camera:
     def switch(self, button):
         if button == "Black and White":
             self.black_and_white = not self.black_and_white
+        elif button == "Facial Rec":
+            self.facial_rec = not self.facial_rec
 
     def get_cam_info(self):
-        cam_info = {"name": self.name, "Black and White": self.black_and_white}
-        return cam_info
+        return {"name": self.name, "Black and White": self.black_and_white}
     
 
     def stop(self):

@@ -1,5 +1,5 @@
-from utils.supabase_storage import save_picture
-from utils.facial_rec import create_embedding
+from utils import save_picture
+from utils import create_embedding
 
 class User:
     cameras = []
