@@ -1,13 +1,12 @@
 import redis
 
-r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 
-def notifications():
-    pass
 
 def detection(username, camera, name_of_person):
     r.publish(f"{username}:{camera}", name_of_person)
 
 def get_detection(username, camera):
     return r.get(f"{username}:{camera}")
+

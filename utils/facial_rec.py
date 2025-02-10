@@ -7,9 +7,9 @@ from .redis_channels import detection
 
 
 def recognize_faces(frame, username, camera_name, user_embeddings):
-    frame_embedding = DeepFace.represent(frame, model_name="Facenet")[0]["embedding"]
+    frame = np.array(frame)
+    frame_embedding = DeepFace.represent(frame, model_name="ArcFace", enforce_detection=False)[0]["embedding"]
     on_screen = "unknown"
-    
     
     for name, stored_embedding in user_embeddings.items():
         distance = cosine(frame_embedding, stored_embedding)
@@ -17,8 +17,8 @@ def recognize_faces(frame, username, camera_name, user_embeddings):
         if distance < .06:
             on_screen = name
 
+        
     detection(username, camera_name, on_screen)
-    
     
     
 

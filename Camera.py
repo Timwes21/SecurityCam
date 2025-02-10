@@ -6,6 +6,8 @@ from utils import recognize_faces
 
 class Camera:
     embeddings = {}
+    recent_detection = ""
+    n = 0
     def __init__(self, username, name, ip, port):
         self.cap = cv2.VideoCapture(0)
         self.username = username
@@ -21,10 +23,12 @@ class Camera:
 
     def update(self):
         while self.running:
+            self.n += 1
             ret, frame = self.cap.read()
 
-            if self.facial_rec:
-                self.face_names = recognize_faces(frame, self.username, self.name, self.embeddings)
+            if self.facial_rec and self.n % 500 == 0:
+                recognize_faces(frame, self.username, self.name, self.embeddings)
+                self.n = 1
 
             if ret:
                 if self.black_and_white:
@@ -42,12 +46,11 @@ class Camera:
     def switch(self, button):
         if button == "Black and White":
             self.black_and_white = not self.black_and_white
-        elif button == "Facial Rec":
+        elif button == "Facial Recognition":
             self.facial_rec = not self.facial_rec
 
     def get_cam_info(self):
-        return {"name": self.name, "Black and White": self.black_and_white}
-    
+        return {"name": self.name, "Black and White": self.black_and_white, "Facial Recognition": self.facial_rec}    
 
     def stop(self):
         self.running = False

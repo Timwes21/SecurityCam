@@ -3,34 +3,14 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 from Camera import Camera, stream, snap
-import asyncio
 from users import User
 from utils import (
-    r,
-    encrypt_password, verify_password,
+    encrypt_password, authenticate,
     UserModel, ButtonsModel, CameraModel,
-
+    users, detections, find_camera, find_user
 )
 
-active_connections = {}
-
-def find_user(users: list, username: str) -> User:
-    for user in users:
-            if user.username == username:
-                return user
-            
-def find_camera(user: User, camera_name: str) -> Camera:
-    for camera in user.cameras:
-            if camera.name == camera_name:
-                return camera
-
-
-        
-
 app = FastAPI()
-
-me = User("timwes21", "jordan18")
-users = [me]        
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins. Replace "*" with specific domains if needed.
@@ -40,26 +20,10 @@ app.add_middleware(
 )
 
 
-
-
-
-@app.websocket("/detections/{username}/{camera}")
-async def detections(websocket: WebSocket, username: str, camera: str):
+@app.websocket("/detections/{username}/{camera_name}")
+async def get_detections(websocket: WebSocket, username: str, camera_name: str):
     await websocket.accept()
-    channel = f"{username}:{camera}"
-    active_connections[channel] = websocket
-
-    sub = r.pubsub()
-    sub.subscribe(channel)
-    try:
-        while True:
-            message = sub.get_message(True)
-            if message:
-                await websocket.send_text(message["data"])
-            await asyncio.sleep(0.1)
-    except:
-        del active_connections[channel]
-        sub.unsubscribe(channel)
+    await websocket.send_text(get_detections(username, camera_name))
 
 
 
@@ -70,12 +34,11 @@ async def video_feed(cam: CameraModel):
     user = find_user(users, cam.username)
     user.cameras.append(camera)
     camera.start()
+    detections[cam.username][cam.name] = []
 
 @app.post("/login")
 async def login(possible_user: UserModel):
-    for user in users:
-        if user.username == possible_user.username and verify_password(possible_user.password, user.password):
-            return "Login successful!"
+    authenticate(possible_user.username, possible_user.password)
     raise HTTPException(status_code=404, detail="Login Not Successful")
 
 @app.post("/new-user")
@@ -83,6 +46,7 @@ async def new_user(user: UserModel):
     password = encrypt_password(user.password)
     new_user = User(user.username, password)
     users.append(new_user)
+    detections[user.username] = {}
 
 @app.get("/load-camera/{username}")
 def load_camera(username: str):
