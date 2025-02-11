@@ -2,12 +2,14 @@ from fastapi import FastAPI, HTTPException, UploadFile, Response, WebSocket
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
-from Camera import Camera, stream, snap
+from Camera import new_camera, stream, snap
 from users import User
 from utils import (
     encrypt_password, authenticate,
     UserModel, ButtonsModel, CameraModel,
-    users, detections, find_camera, find_user
+    users, detections, find_camera, find_user,
+    create_embedding,
+    get_detection
 )
 
 app = FastAPI()
@@ -21,16 +23,16 @@ app.add_middleware(
 
 
 @app.websocket("/detections/{username}/{camera_name}")
-async def get_detections(websocket: WebSocket, username: str, camera_name: str):
+async def get_detections_websocket(websocket: WebSocket, username: str, camera_name: str):
     await websocket.accept()
-    await websocket.send_text(get_detections(username, camera_name))
+    await websocket.send_text(get_detection(username, camera_name))
 
 
 
 
 @app.post("/add-camera")
 async def video_feed(cam: CameraModel):
-    camera = Camera(cam.username, cam.name, cam.ip_address, cam.port)
+    camera = new_camera(cam.username, cam.name, cam.ip_address, cam.port)
     user = find_user(users, cam.username)
     user.cameras.append(camera)
     camera.start()
@@ -84,13 +86,6 @@ def save_photo(username: str):
     user.save_photo()
 
 
-@app.get("/people/{username}/{name_of_person}")
-def get_people(username: str, name_of_person: str):
-    user = find_user(users, username)
-    user.add_a_face(name_of_person)
-
-
-
 @app.post("/buttons")
 async def buttons(button: ButtonsModel):
     user = find_user(users, button.username)
@@ -98,11 +93,11 @@ async def buttons(button: ButtonsModel):
     camera.switch(button.button_pressed)
 
 
-@app.post("/upload-photos/{username}")
-async def upload_photos(username: str, files: List[UploadFile]):
+@app.post("/upload-photos/{username}/{name}")
+async def upload_photos(username: str, name: str, files: List[UploadFile]):
     user = find_user(users, username)
-    user.add_a_face(files)
-    return {"message": "git the images!"}
+    embedding = create_embedding(files)
+    user.add_a_face(embedding, name)
 
     
 

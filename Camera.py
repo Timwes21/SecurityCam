@@ -14,7 +14,7 @@ class Camera:
         self.name = name
         self.running = True
         self.black_and_white = True
-        self.facial_rec = False
+        self.facial_rec = True
         self.frame_queue = queue.Queue(maxsize=10)
         self.thread = threading.Thread(target=self.update, daemon=True)
 
@@ -83,3 +83,5 @@ def snap(video):
             return buffer.tobytes()
         
 
+def new_camera(username, name, ip_address, port):
+    return Camera(username, name, ip_address, port)

@@ -1,6 +1,6 @@
 import bcrypt
 from users import User
-from database import users
+from .database import users
 
 
 def encrypt_password(password: str) -> str:

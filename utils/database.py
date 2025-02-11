@@ -1,13 +1,11 @@
-from users import User
-from Camera import Camera
+from users import new_user
 
-
-def find_user(users: list, username: str) -> User:
+def find_user(users, username):
     for user in users:
             if user.username == username:
                 return user
             
-def find_camera(user: User, camera_name: str) -> Camera:
+def find_camera(user, camera_name):
     for camera in user.cameras:
             if camera.name == camera_name:
                 return camera
@@ -15,7 +13,7 @@ def find_camera(user: User, camera_name: str) -> Camera:
 
 
 
-me = User("timwes21", "jordan18")
+me = new_user("timwes21", "jordan18")
 # simulated db for prototyping
 users = [me]        
 
@@ -26,4 +24,6 @@ def set_detection(username, camera, detected):
 
 def get_detection(username, camera):
     return detections[username][camera]
+
+
      

@@ -1,9 +1,7 @@
 from utils import save_picture
-from utils import create_embedding
 
 class User:
     cameras = []
-    recognizable_people = []
     recent_photo = None
     def __init__(self, username, password):
         self.username = username
@@ -19,19 +17,20 @@ class User:
                 cam.stop()
                 self.cameras.remove(cam)
 
-    def add_a_face(self, name):
-        create_embedding(self.recent_photo, name, self.username)
+    def get_recent_photo(self):
+        return self.recent_photo
 
     def set_temporary_photo(self, image_bytes):
         self.recent_photo = image_bytes
 
+    def add_a_face(self, embedding, name):
+        for camera in self.cameras:
+            camera.add_embeddings(name, embedding)
 
     def save_photo(self):
         save_picture(self.username, self.recent_photo)
         self.recent_photo = None 
     
-    def get_embedings(self, name, files):
-        embeddings = create_embedding(files)
-        for camera in self.cameras:
-            camera.add_embeddings(name, embeddings)
         
+def new_user(username, password):
+    return User(username, password)
