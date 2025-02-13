@@ -26,7 +26,7 @@ class Camera:
             self.n += 1
             ret, frame = self.cap.read()
 
-            if self.facial_rec and self.n % 500 == 0:
+            if self.facial_rec and self.n % 100 == 0:
                 recognize_faces(frame, self.username, self.name, self.embeddings)
                 self.n = 1
 

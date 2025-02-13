@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 from Camera import new_camera, stream, snap
 from users import User
+import asyncio
+import threading
 from utils import (
     encrypt_password, authenticate,
     UserModel, ButtonsModel, CameraModel,
@@ -20,14 +22,12 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all HTTP methods.
     allow_headers=["*"],  # Allows all HTTP headers.
 )
-
+    
 
 @app.websocket("/detections/{username}/{camera_name}")
 async def get_detections_websocket(websocket: WebSocket, username: str, camera_name: str):
     await websocket.accept()
     await websocket.send_text(get_detection(username, camera_name))
-
-
 
 
 @app.post("/add-camera")
