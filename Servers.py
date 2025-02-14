@@ -4,8 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 from Camera import new_camera, stream, snap
 from users import User
-import asyncio
-import threading
 from utils import (
     encrypt_password, authenticate,
     UserModel, ButtonsModel, CameraModel,
