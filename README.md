@@ -4,7 +4,7 @@
 The security buddy is desinged for ip cameras that have no out of the box software. You will have Generally speaking, any camera with a readily available IP address and/or port will manage fine. 
 
 ## Why?
-If you have a high quality wireless camera with nothing other than streaming, then this aaplication is for you.
+If you have a high quality wireless camera with nothing other than streaming, then this application is for you.
 
 ## Quick Start
 ### Go to URL
