@@ -3,7 +3,7 @@ from PIL import Image
 import io
 from scipy.spatial.distance import cosine
 import numpy as np
-from .database import set_detection
+from .redis_channels import set_detection
 
 
 def recognize_faces(frame, username, camera_name, user_embeddings):
