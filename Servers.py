@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, Response, WebSocket
+from fastapi import FastAPI, HTTPException, UploadFile, Response, WebSocket, File
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
@@ -92,9 +92,13 @@ async def buttons(button: ButtonsModel):
 
 
 @app.post("/upload-photos/{username}/{name}")
-async def upload_photos(username: str, name: str, files: List[UploadFile]):
+async def upload_photos(username: str, name: str, files: List[UploadFile] = File(...)):
     user = find_user(username)
-    embedding = create_embedding(files)
+    image_bytes_list = [await file.read() for file in files]
+    print("made it to line 3")
+    embedding = create_embedding(image_bytes_list)
+    if not len(embedding):
+        return {"message": "Could not get model from photo(s)"}
     user.add_a_face(embedding, name)
 
     

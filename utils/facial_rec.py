@@ -25,9 +25,10 @@ def recognize_faces(frame, username, camera_name, user_embeddings):
 def create_embedding(image_bytes_list):
     
     embeddings = []
-    for image_bytes in image_bytes_list:
+    for i, image_bytes in enumerate(image_bytes_list):
         image = Image.open(io.BytesIO(image_bytes))
-        embedding = DeepFace.represent(img_path=image, model_name="Facenet")[0]["embedding"]
+        image_np = np.array(image)
+        embedding = DeepFace.represent(img_path=image_np, model_name="Facenet")[0]["embedding"]
         embedding_array = np.array(embedding)
         embeddings.append(embedding_array)
 
