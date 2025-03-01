@@ -25,6 +25,8 @@ app.add_middleware(
 @app.websocket("/detections/{username}/{camera_name}")
 async def get_detections_websocket(websocket: WebSocket, username: str, camera_name: str):
     await websocket.accept()
+    result = get_detection(username, camera_name)
+    print(result)
     await websocket.send_text(get_detection(username, camera_name))
 
 
@@ -74,8 +76,11 @@ def cam(username: str, camera_name: str):
 def snap_pic(username: str, camera_name: str):
     user = find_user(username)
     camera = find_camera(user, camera_name)
+    if not camera:
+        raise HTTPException(status_code=404, detail="No Camera Selected")     
     image_bytes = snap(camera)
     user.set_temporary_photo(image_bytes)
+    print(user.username)
     return Response(snap(camera), media_type="image/jpeg")
 
 @app.get("/save-photo/{username}")
@@ -95,7 +100,6 @@ async def buttons(button: ButtonsModel):
 async def upload_photos(username: str, name: str, files: List[UploadFile] = File(...)):
     user = find_user(username)
     image_bytes_list = [await file.read() for file in files]
-    print("made it to line 3")
     embedding = create_embedding(image_bytes_list)
     if not len(embedding):
         return {"message": "Could not get model from photo(s)"}

@@ -25,10 +25,12 @@ class User:
 
     def add_a_face(self, embedding, name):
         for camera in self.cameras:
-            camera.add_embeddings(name, embedding)
+            camera.add_embeddings(embedding, name)
 
     def save_photo(self):
         save_picture(self.username, self.recent_photo)
+        if self.recent_photo is None:
+            raise ValueError("recent photo is None")
         self.recent_photo = None 
     
         

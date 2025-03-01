@@ -1,4 +1,3 @@
-- store users in a database
-- use websockets to manage user authentication
+Improvements:
 - use the uuid library to make user sessions tokens
-- organize package
+- vector database for embddings

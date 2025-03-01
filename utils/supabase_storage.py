@@ -7,8 +7,12 @@ supabase: Client = create_client(url, key)
 def save_picture(username, image_bytes):
     images = supabase.storage.from_("user-images").list(f"{username}/")
     image_index = len(images) + 1
-    supabase.storage.from_("Images").upload(f"{username}/image{image_index}.jpg", image_bytes, {"content-type": "image/jpeg"})
-
+    if image_bytes is None:
+        raise ValueError("image_bytes is None")
+    try:
+        supabase.storage.from_("Images").upload(f"{username}/image{image_index}.jpg", image_bytes, {"content-type": "image/jpeg"})
+    except Exception as e:
+        print(e)
 
 def update_camera(username, camera, name):
     supabase.table("on_camera").upsert({"username": username, "camera": camera, "person(s)_spotted": name})
