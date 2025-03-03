@@ -9,6 +9,10 @@ body{
     background: rgb(255, 255, 255);
 
 }
+.home{
+    background: rgb(200, 46, 46);
+    visibility: hidden;
+}
 .user-input-page{
     display: flex;
     align-items: center;
@@ -52,6 +56,11 @@ body{
     color: white;
     height: 50px;
     width: 45%;
+}
+.main{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+    
 }
 .heading{
     display: flex;
@@ -185,20 +194,7 @@ body{
     justify-content:space-around;
     
 }
-.button-con{
-    background: rgb(255, 255, 255);
-    height: 100%;
-    width: 350px;
-    border-radius: 20px;
-    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.47);
-    border: 1px solid rgb(255, 0, 0);
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    
-}
+
 .buttons-controls h1{
     display: flex;
     align-items: center;
@@ -209,16 +205,16 @@ body{
     
 }
 .buttons-controls{
-    display: flex;
+    display:flex;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;
     gap: 20px;
     box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.47);
-    border: 1px solid rgb(255, 0, 0);
+    border: 1px solid rgb(75, 0, 0);
     border-radius: 10px;
-    
-    
+    width: 30vw;
+    background-color: rgb(190, 190, 190);
 }
 .main-controls{
     display: flex;
@@ -247,6 +243,28 @@ body{
 .buttons-controls button:active{
     background-color: rgb(121, 0, 0);
 }
+
+.face-rec{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.face-rec button{
+    margin-bottom: 20px;
+}
+.people{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.people button{
+    background-color: white;
+    border-color: red;
+    color: black;
+    margin: 0;
+}
 .status{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
@@ -265,8 +283,8 @@ body{
 }
 .camera-buttons{
     display: flex;
+    gap: 20px;
     padding: 10px;
-    background-color: antiquewhite;
 
 }
 .camera-buttons button{
@@ -278,7 +296,7 @@ body{
     flex-direction: column;
     gap: 5px;
 }
-.delete-camera{
+.delete-button-div{
     margin: 5px;
 }
 .video-feed{
@@ -317,10 +335,6 @@ body{
     
     
 }
-.video-buttons{
-    /* position:absolute; */
-    visibility: ;
-}
 .video-buttons button{
     border: 0;
     background-color: rgb(198, 0, 0);
@@ -331,7 +345,7 @@ body{
 .video{
     width: 95%;
     height: 400px;
-    background-color: rgb(92, 92, 92);
+    background-color: rgb(25, 19, 148);
     border-radius: 5px;
     overflow: hidden;
     position: relative;
@@ -409,4 +423,29 @@ body{
     color: white;
     padding: 5px;
 }
+.add-person-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+}
+.face-rec-button-div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.camera-results{
+    font-size: small;
+}
+.camera-button{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+input{
+    background-color: rgb(190, 190, 190);
 
+}

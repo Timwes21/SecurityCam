@@ -6,7 +6,7 @@
     <title>Security Camera</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="home">
     <header>
         <div class="heading">
             <div class="leftside">
@@ -30,7 +30,7 @@
                 </div>
                 <h3 class="logout">Log Out</h3>
             </div>
-            <h1>Security Camera</h1>
+            <h1>The Security Buddy</h1>
             <button class="gallery-button">Gallery</button>
         </div>
     </header>
@@ -49,31 +49,19 @@
     </div>
     <section class="main">
         <div class="buttons-controls">
-            
-                <h1>Controls</h1>
-                <div class="main-controls">
-
-                    <div class="control">
-                        <p id="facial-status" class="status"></p>
-                        <button id="facial-rec">Facial Recognition</button>
+                <div class="face-rec">
+                    <h2>Facial Recogniton</h2>
+                    <div class="add-person">
+                        <button id="add-person">Add A Person</button>
                     </div>
-                    
-                    <div class="control">
-                        <p id="notif-status" class="status"></p>
-                        <button id="notif">Notifications</button>
-                    </div>
-                    
-                    <div class="control">
-                        <p class="status" id="black-and-white-status"></p>
-                        <button id="black-and-white">Black and White</button>
-                    </div>
-                    
                 </div>
-                <h2>Cameras</h2>
+                <h3>Cameras</h3>
                 <button class="add-camera" id="add-cam">Add a Camera</button>
                 <div class="input"></div>
                 <div class="camera-buttons"></div>
-                <button class="delete-camera">Delete Camera</button>
+                <div class="delete-button-div">
+                    <button class="delete-camera">Delete Camera</button>
+                </div>
             
         </div>
         <div class="video-feed">
@@ -82,14 +70,15 @@
             </div>
                 <div class="video"><img id="img" src=""  alt=""></div>
             <div class="video-footer">
-                <p class="chosen-camera"></p>
+                <p class="on-screen"></p>
                 <div class="video-buttons">
                     <button id="snap">Snap Picture</button>
+                    <button id="black-and-white">Black and White</button>
                 </div>
                 <p class="message-to-user"></p>
             </div>
         </div>
     </section>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
