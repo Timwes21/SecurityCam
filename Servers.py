@@ -3,11 +3,10 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 from Camera import new_camera, stream, snap
-from users import User
 from utils import (
     encrypt_password, authenticate,
     UserModel, ButtonsModel, CameraModel,
-    find_camera, find_user, set_new_user,
+    find_camera, find_user, set_new_user, update_class,
     create_embedding,
     get_detection
 )
@@ -20,7 +19,8 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all HTTP methods.
     allow_headers=["*"],  # Allows all HTTP headers.
 )
-    
+
+cameras = {}
 
 @app.websocket("/detections/{username}/{camera_name}")
 async def get_detections_websocket(websocket: WebSocket, username: str, camera_name: str):
@@ -46,24 +46,20 @@ async def login(possible_user: UserModel):
 @app.post("/new-user")
 async def new_user(user: UserModel):
     password = encrypt_password(user.password)
-    new_user = User(user.username, password)
-    res = set_new_user(new_user)
+    res = set_new_user(user.username, password)
     return res
 
 @app.get("/load-camera/{username}")
 def load_camera(username: str):
-    cameras = []
-    user = find_user(username)
-    for camera in user.cameras:
-        cameras.append(camera.get_cam_info())
-    return cameras
+    return cameras[username]
 
 
 @app.get("/delete-camera/{username}/{camera}")
 async def delete_camera(username: str, camera: str):
-    user = find_user(username)
-    user.delete_camera(camera)
-
+    for cam in cameras[username]:
+        if cam.name == camera:
+            cam.stop()
+            cameras[username].remove(cam)
 
 @app.get("/camera/{username}/{camera_name}")
 def cam(username: str, camera_name: str):
@@ -80,7 +76,9 @@ def snap_pic(username: str, camera_name: str):
         raise HTTPException(status_code=404, detail="No Camera Selected")     
     image_bytes = snap(camera)
     user.set_temporary_photo(image_bytes)
-    print(user.username)
+    if not user.recent_photo:
+        raise HTTPException(status_code=404, detail="No Photo Taken")
+    update_class(username, user)
     return Response(snap(camera), media_type="image/jpeg")
 
 @app.get("/save-photo/{username}")
@@ -104,6 +102,7 @@ async def upload_photos(username: str, name: str, files: List[UploadFile] = File
     if not len(embedding):
         return {"message": "Could not get model from photo(s)"}
     user.add_a_face(embedding, name)
+    update_class(username, user)
 
     
 

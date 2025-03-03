@@ -2,10 +2,10 @@ from utils import save_picture
 
 class User:
     cameras = []
-    recent_photo = None
     def __init__(self, username, password):
         self.username = username
         self.password = password
+        self.recent_photo = None
 
     def add_camera(self, ip_address, camera_name, port):
         self.cameras[camera_name] = [ip_address, port]
@@ -21,7 +21,11 @@ class User:
         return self.recent_photo
 
     def set_temporary_photo(self, image_bytes):
+        if image_bytes is None:
+            raise ValueError("recent photo is None")
         self.recent_photo = image_bytes
+        if self.recent_photo is None:
+            raise ValueError("recent photo is None")
 
     def add_a_face(self, embedding, name):
         for camera in self.cameras:
@@ -29,8 +33,6 @@ class User:
 
     def save_photo(self):
         save_picture(self.username, self.recent_photo)
-        if self.recent_photo is None:
-            raise ValueError("recent photo is None")
         self.recent_photo = None 
     
         
