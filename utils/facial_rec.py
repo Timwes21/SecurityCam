@@ -4,22 +4,26 @@ import io
 from scipy.spatial.distance import cosine
 import numpy as np
 from .redis_channels import set_detection
+from .database import get_embeddings
 
 
-def recognize_faces(frame, username, camera_name, user_embeddings):
+
+def recognize_faces(frame, username, camera_name):
     frame_resized = Image.fromarray(frame).resize((112, 112))  
     frame = np.array(frame_resized)
     frame_embedding = DeepFace.represent(img_path=frame, model_name="ArcFace", enforce_detection=False)[0]["embedding"]
     on_screen = "unknown"
+
+    user_embeddings = get_embeddings(username)
     
-    for name, stored_embedding in user_embeddings.items():
+    for name, stored_embedding in user_embeddings:
         try:
             distance = cosine(frame_embedding, stored_embedding)
         except:
             print("not being defined")
         if distance < .03:
             on_screen = name
-        print(name)
+        print(distance)
 
     set_detection(username, camera_name, on_screen)
     

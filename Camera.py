@@ -5,8 +5,6 @@ import cv2
 from utils import recognize_faces
 
 class Camera:
-    embeddings = {}
-    recent_detection = ""
     n = 0
     def __init__(self, username, name, ip, port):
         self.cap = cv2.VideoCapture(0)
@@ -27,7 +25,7 @@ class Camera:
             ret, frame = self.cap.read()
 
             if self.facial_rec and self.n % 100 == 0:
-                recognize_faces(frame, self.username, self.name, self.embeddings)
+                recognize_faces(frame, self.username, self.name)
                 self.n = 1
 
             if ret:
@@ -39,9 +37,6 @@ class Camera:
 
     def get_frame(self):
         return self.frame_queue.get()
-    
-    def add_embeddings(self, embeding, name):
-        self.embeddings[name] = embeding
     
     def switch(self, button):
         if button == "Black and White":

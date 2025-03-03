@@ -1,29 +1,29 @@
-# from users import new_user
 from sqlalchemy import create_engine, text
 import pickle 
-# from .user_auth import verify_password
+from .user_auth import verify_password
+from .supabase_storage import save_picture
 engine = create_engine("sqlite:///users.db", connect_args={"check_same_thread": False})
 
 # with engine.connect() as con:
 #     con.execute(text("""CREATE TABLE users(
 #                 id INTEGER PRIMARY KEY AUTOINCREMENT,
 #                 username TEXT UNIQUE,
-#                 password TEXT)"""))
-
+#                 password TEXT,
+#                 temporary_photo BLOB)"""))
 
 # with engine.connect() as con:
-#     con.execute(text("""CREATE TABLE gallery(
+#     con.execute(text("""CREATE TABLE embeddings(
 #                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-#                 username TEXT UNIQUE,
-#                 camera_name TEXT,
-#                 images BLOB,
-#                 FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE)"""))
+#                 username TEXT,
+#                 name TEXT,
+#                 embedding BLOB,
+#                 FOREIGN KEY(username) REFERENCES users(username))"""))
+
+
+
 
 # with engine.connect() as con:
-#     con.execute(text("""DROP TABLE IF EXISTS userstable"""))
-#     con.execute(text("""DROP TABLE IF EXISTS cameras"""))
-#     con.execute(text("""DROP TABLE IF EXISTS gallery"""))
-#     con.execute(text("""DROP TABLE IF EXISTS users"""))
+    # con.execute(text("""DROP TABLE IF EXISTS users"""))
     
 
 def find_user(username):
@@ -35,7 +35,7 @@ def find_user(username):
 def set_new_user(username, password):
      with engine.connect() as con:
         try:
-            con.execute(text("INSERT INTO userstable(username, password) VALUES (:username, :password)"), {"username": username, "password": password})
+            con.execute(text("INSERT INTO users(username, password) VALUES (:username, :password)"), {"username": username, "password": password})
             con.commit()
             return 0
         except Exception as e:
@@ -43,24 +43,40 @@ def set_new_user(username, password):
             return 1
         
         
-# def authenticate(username, password):
-#     with engine.connect() as con:
-#         try:
-#             user_password = con.execute(text("SELECT pasword FROM userstable WHERE username = :username"), {"username": username}).fetchone()
-#             if user_password is None:
-#                 return 2
-#             if verify_password(password, user_password):
-#                 return 0
-#         except Exception as e:
-#             return 1
-        
-def update_camera(username, camera, camera_name):
+def authenticate(username, password):
     with engine.connect() as con:
-        camera_serialized = pickle.dumps(camera)
-        con.execute(text("UPDATE cameras SET camera = :camera WHERE username = :username AND camera_name =:camera_name"), {"camera": camera_serialized, "username": username, "camera_name":camera_name})
+        try:
+            user_password = con.execute(text("SELECT password FROM users WHERE username = :username"), {"username": username}).fetchone()
+            if user_password is None:
+                return 2
+            if verify_password(password, user_password):
+                return 0
+        except Exception as e:
+            return 1
+        
+
+def set_temporary_photo(username, image_bytes):
+    with engine.connect() as con:
+        con.execute(text("UPDATE users SET temporary_photo = :image_bytes WHERE username = :username"), {"image_bytes": image_bytes, "username": username})
+        con.commit()
+
+def save_temporary_photo(username):
+    with engine.connect() as con:
+        image_bytes = con.execute(text("SELECT temporary_photo FROM users WHERE username = :username"), {"username": username}).fetchone()
+        save_picture(username, image_bytes)
+        con.execute(text("UPDATE users SET temporary_photo = NULL WHERE username = :username"), {"username": username})
         con.commit()
         
 
+def save_embedding(username, name, embedding):
+    with engine.connect() as con:
+        con.execute(text("INSERT INTO embeddings(username, name, embedding) VALUES (:username, :name, :embedding)"), {"username": username, "name": name, "embedding": embedding})
+        con.commit()
+
+def get_embeddings(username):
+    with engine.connect() as con:
+        embeddings = con.execute(text("SELECT name, embedding FROM embeddings WHERE username = :username"), {"username": username}).fetchall()
+        return embeddings
 
 
 # me = new_user("timwes21", "jordan18")
